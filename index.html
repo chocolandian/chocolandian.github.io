@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="preload" href="/json/main.json" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="/json/hapinesuwanpi.json" as="fetch" crossorigin="anonymous">
+    <script src="/components.js" type="module"></script>
+    <script src="/main.js" type="module"></script>
+    <title>チョコットランドのコーデが好きすぎる</title>
+    <style>
+    :root {
+        --outer-frame-width: 10px;
+        --main-view-width: 600px;
+        --view-radius: 6px;
+        --view-background-color: rgb(254, 236, 204);
+        --view-border-color: rgb(32, 43, 96);
+        --scrollbar-track-color: rgb(177, 162, 166);
+        --scrollbar-entire-width: 19px;
+    }
+    @media (width < 630px) {
+        :root {
+            --main-view-width: calc(100vw - 20px);
+            --outer-frame-width: 5px;
+        }
+    }
+
+    ::selection {
+        background-color: var(--scrollbar-track-color);
+        color: var(--view-background-color);
+    }
+    body {
+        font-family: sans-serif;
+        background-color: rgb(220, 217, 167);
+        margin: 0;
+        overflow: hidden;
+        border-color: var(--view-border-color);
+        border-style: solid;
+        border-width: 0 var(--outer-frame-width) var(--outer-frame-width);
+        height: 100vh;
+        height: 100dvh;
+        box-sizing: border-box;
+        cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAWBAMAAADHkSqFAAAAElBMVEVHcEySi6iws83////e3vVWU23WRqBqAAAAAXRSTlMAQObYZgAAAJNJREFUGNNNkEEOxCAIRe3CA2j0AI56AfECVWY/mnD/qwy1pPWveOET+Cjlf+rVEb871bY1dUVuGhKKWMlEEJwAIQGU26+5ZKFMjwsRs0zaDvUhNexOLnQmWXLAGQFbanQTsrMDrKN0QhZDWksmsg8KuUV6YoiQ6SPnEMVK44mmXTHOP8Fms+ebcyT0W2ib9//QBX9hUR8RdgCMqgAAAABJRU5ErkJggg=='), auto;
+
+        &.pointer-pressing {
+            animation: pressing 0.4s infinite;
+            animation-delay: 0.2s;
+        }
+    }
+    @keyframes pressing {
+        50% {
+            cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAWBAMAAADHkSqFAAAAElBMVEVHcEySi6iws83////e3vVWU23WRqBqAAAAAXRSTlMAQObYZgAAAJRJREFUGNN9z8EVwiAMBmB6YACQDtBCB9DgAhDuoGX/VUyAKidzysfLS36E+FOLmmVCnXRDphpPbyQqC50noN8cwLNJUsf1yI1VMzx2ESMBj7G2ONZa+6KXsh5D9FsbNgiAESCwFkBAelgNS1JPutc2KTXFsZBKGidwt3DoNC7WYr1y+fqJPL0OXwn5C9MC7XmS5Fwfc3UfSc9I/b0AAAAASUVORK5CYII='), auto;
+        }
+    }
+
+    a {
+        color: inherit;
+        text-decoration-skip-ink: none;
+    }
+    button {
+        padding: 0;
+        border: none;
+        outline: none;
+        font: inherit;
+        color: inherit;
+        cursor: inherit;
+        background: none;
+    }
+    ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+    h1,h2,h3,h4,h5,h6 {
+        margin: 0;
+    }
+    hr {
+        margin: 0;
+        border: none;
+        padding: 0;
+        height: 0;
+
+        &:not(:last-child) {
+            height: 10px;
+        }
+    }
+    p {
+        line-height: 34px;
+        margin: 16px 0;
+
+        &:first-child {
+            margin-top: 0;
+        }
+        &:last-child {
+            margin-bottom: 0;
+        }
+        &:has(>small:first-child:last-child) {
+            line-height: revert;
+        }
+    }
+    img,
+    canvas {
+        user-select: none;
+    }
+    img:not([src]),
+    canvas:not([data-hashed-src]) {
+        visibility: hidden;
+    }
+
+    .fixed-header-container {
+        display: flex;
+        flex-direction: column;
+
+        > :first-child {
+            flex-shrink: 0;
+        }
+        > :nth-child(2) {
+            flex-grow: 1;
+        }
+    }
+
+    #title-bar {
+        display: flex;
+        background-color: var(--view-border-color);
+        padding: 5px;
+        justify-content: center;
+        color: var(--view-border-color);
+
+        h1 {
+            align-self: center;
+            text-align: center;
+            background: var(--view-background-color);
+            width: 100%;
+            max-width: 800px;
+            border-radius: 6px;
+            line-height: 1.5;
+            font-size: 1.2em;
+            font-weight: bold;
+            font-family: 'ＭＳ Ｐゴシック', sans-serif;
+        }
+    }
+    @media (width < 630px) {
+        #title-bar {
+            padding: 3px;
+
+            h1 {
+                font-size: 1.1em;
+            }
+            .ellipsis-on-mobile {
+                display: none;
+            }
+        }
+    }
+
+    main {
+        position: relative;
+
+        >* {
+            position: absolute;
+        }
+        >#background {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+
+            picture img,
+            >figure {
+                position: absolute;
+                margin: auto;
+            }
+            picture img {
+                inset: -999%;
+            }
+        }
+    }
+    </style>
+</head>
+
+<body class="fixed-header-container">
+    <header id="title-bar">
+        <h1 aria-label="チョコットランドのコーデが好きすぎる">チョコ<span class="ellipsis-on-mobile">ット</span>ラン<span class="ellipsis-on-mobile">ド</span>のコーデが好きすぎる</h1>
+    </header>
+    <main>
+        <div id="background">
+            <picture>
+                <source type="image/avif" srcset="/images/background/wistera.avif">
+                <img src="/images/background/wistera.webp" alt="ウィステラの街" width="1920" height="1080">
+            </picture>
+        </div>
+    </main>
+</body>
+
+</html>

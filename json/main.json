@@ -1,0 +1,207 @@
+{
+  "items": {
+    "ファイトフキダシ": {
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAElBMVEVHcEz///8gK2CVjrne3vXoWW0Homh5AAAAAXRSTlMAQObYZgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAANFJREFUKM91kdFtwzAMRA1tcFQGiM7oAFS9gGxNYKD7r1KSihLYaPUhmM88ikcuy9+H5PMWXwi59V4/JHFrAConKFgdoL5SEiAKBTJnAlAczJQB/JYAyT8Vm0mGJrH1Q3EYQABWixqzKUYRHmtvYOj2AK13BMjfI8OaEjoQ3kHZJ4jfRXQADVAhoiGJxqwq5TH6SKvH+euU6c7rYf85y8vLQrPxUJxvt64xM+U9D3+neiNzYuY3Xv7M1KauWet1D9bpdVPlGlsZ3pf7vIG0/Hd+AUwxI9SSyxrYAAAAAElFTkSuQmCC",
+      "popup": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJwAAADICAMAAAAqeXieAAAASFBMVEVHcEze3vWIhZH5kjaxoqb///+Vjrnhy7ggK2D/68h5eIqmnp5NUXXEuKzSxbPh0brw3sEvOGdbXnzoWW21q6U+RW6XkZdqa4MQNl7mAAAAAXRSTlMAQObYZgAAAAlwSFlzAAAOwwAADsMBx2+oZAAABK9JREFUeNrt3Yt6ojAQBtDiBf6Id233/d90ExJgcsEKChl3J7vbFcRynEwmUerXry/TwK59tQ0sG2eb1Zn/V0q34zcD0eXnor/udk5ncYf6qFYMcCt1vOgvZ4tzu3b63+p6Vmq100E87fXOb3WAOnWbC7VaHbXNnrDFmaZtd61Tp4O6E5zbXE7X2jrcoa6v3+qIH7XTUVSHk1FanNlcEHdVpmc9nMnAizpddOap41UdVnX9x9zQOLO5nG1/Pt9bHcXhbvKr6eJmbJzN5q7bXMq2N3lHcNfa9rKO12Wnu9hi9nX9s+o3F2m7Jt/qmuC8u20UBzaXLcNxYOv9g82lcYppE9wsuCpf+xVXVZl1BNcNEYY4MoCfwYF8Td7lbgCz4dyOQUB7j3dcj2v3TRDGuPV6nYocBoODaC9hIngWeAm3XltdEufFhkTsQTiDrp0FhzjTyPmBgXCi/RsEcR4cqi6Bkt2KKPu8ZMMcOYfBCPonRPXgwLG2J0vJw3OmA0OG68DQeQ8O6aeOBCMeGLSm/MMzBO+59bNwrJdMshL+dNyGYfsMnOSc4MZX6bHHvgM3puCPnBwE927c7/UnG+658pgH54cm1cgRy+N+T7VcuM1zuE0mXFijvZc8wVFZcfGrRTY4YyoL08qAlx9naVvbSiSPWnZu7XHQJK3bbnveqCE9w6qkOy0aEUrDinSZcXDxQo8juszdSnHt7W2EyzMg0IKabi3czS50uXEotqaGGFxRtk4WOF1EYFmFBrmkQ591mXG67pr62yRa38EFE5zp1GJLcNtSNy44Nz7R4cyMwRjHp1tJs0I9RJjgSmIrbSVGyWO09kW4C5zuUyZ1zgtdidsNdpINcbnm1i50hbbd7CZQcViVVGiXcs3cdYNblbjnlRlXuY61s2tvq/J3q71cVbrlOYjNPjbrgGgvptFR0V5a44FrLuuWZk618atY4SzPFTrvoXnrXEV4W+9iqWKEq8IfK+HwotrTRQ/M/oo/dfWc0Xslww/Khtuk35Hm8P4c63c2x70nvPgVnDHvpme49sWFJhfm5MKc4AQnOMEJjhWO9dwqP8uk5k+6KSm31ICYphOc4AQnOMEJLueSKcfcKksmWTLJaBWc4AQnOMHJkkmWTJ+Ok8+3yudbc+NAb0QHoP8fy+C8jyn1uHZfJyTHJT7ZhPSHsd4TOQSnJ1IE2/2OobDPgQvOT7u2DZiLZTJImCvnEBm7vAINVmOC+0N7/61ZmML5aRPejT50QeQwLy51K96JLoxQcUrMhUuJgLCvvUryIF/fikueiNYUFdQXkC6m97+tqn/GDIFUJQtGKQYG9UAlSSbzxBmi6RkMJJ9X+R9ObrQ0J4f8tG4l5WNoqCZwiScRRwqTYudFTuHR2RNxJcclijC8Z4vXcq5/znFywZXcYAh7oUGwVEiUxnfUOSTms36qomWYJgSRY6BuT40c0osReKFL4bqpjCRXjMOLRbj/FojKhR9eBOsAX4H4wS+WEpdvcb0nsz1JSgwNcCS+ydQyLy9wBCc4wQlOcIITnOAEJzjBCU5wghOc4AQnOMEJTnCCE9z/iwNXW/M7UtkGzv4CV5ZxA/ffGcyUZ1x/AbD84IszJ15FAAAAAElFTkSuQmCC",
+      "type": "fukidashi"
+    },
+    "アリガトフキダシ": {
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAElBMVEVHcEz///8gK2CVjrne3vX/pqkR5iZXAAAAAXRSTlMAQObYZgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAALdJREFUKM+NkVEKhDAMRKU3SMR/Mz2BZS+geAE/ev+rbJIGu5Vd2BGK8whJM52m7wKwPvxAgNd5lk4SNlIV3AXulURJys3THCXhoaSVCMBMYp+DJMQqiAI0wGIVoghtBhMZkJiDXbtmB3I0QLf+BrxRIT8a0D/bxg6fohe7hdituluu2A5LvQzUymvEUYkBrYhALI8ZuefhiWXpiXmmx/6Rqabu9xjeQduOLyWj1zZ4Pu76AGn6pTeSnSJOlmH8/gAAAABJRU5ErkJggg==",
+      "popup": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJwAAADICAMAAAAqeXieAAAASFBMVEVHcEyIhZH5kjZ5eIqxoqb///+Vjrnhy7ggK2D/68imnp7e3vX/pqlNUXXEuKzSxbPh0brw3sEvOGdbXny1q6U+RW6XkZdqa4NlWlHUAAAAAXRSTlMAQObYZgAAAAlwSFlzAAAOwwAADsMBx2+oZAAABJJJREFUeNrt3Ql7ojAQBuB6wRest+3+/3+6uYDJgVUKZNyddGsFobxOJhOU9enHh2lg1z7aBpaNs83pzM+V0u30xUB0/b7q283G6xzu2JzUigFupU5XfXNxOL9qo79Xt4tSq40O4vmgV36pI9S5W1yoNeqkbe6ALc40bbtrnTof1Z3g/OJyutbW4Y5Nc/tSJ3yrjY6iOp6N0uHM4oK4mzI9G+BMBl7V+aozT51u6rhqmj/mjsaZxeVsh8vl3uooDneTX7aL7di4mMVNt7iU7WDyjuBujetlHa/rRnexwxya5nvVLy7SNjbfmobggoddFAcWly3DaWCbw4PFpXGKaRPcLLi6XPsRV9eFdQTXDRGGODKAszh0N/YWZLnObBluNwuuXZPiQke/WYBr140Qprj1ep2NXICjECQhI4/S2GIozE/j1munC3CgR0F0JAQxiSKHqGtnwaEextEuQ2JEne48deSi35/Nvm49zb4g2TBDziE/ZFMccgyMtD1XSlLbAC53F4j7elJcEBqSZ2nVyAwMWlP+4RmC99z6XjjWp0xyJvzuuC3D9h44yTnBvV6lX912CtwrBf/FyUFwU+N+rj/FcM+VxzK4MDS5RrZYHvdzqpXCbZ/DbQvh4hodvOSJtiqKS18tssEZU7U3rYp45XGGtmtbhexWy86tPY7SPO+lIT3DWUl32NgW6ArjQhrgeTy6FTszBnbmy/zz32AxIFyoHM4r7SK44Oz3zt/4MHLA2dHg8qzFBWOiMG6/c0PCKdtu3XPB5Zrg3h9nk67Cjtxjgqv8ZF91037FZbT6Ipw0LkVYB+rzk7jMQhXjSs2t0ByiswtAzeGspDahszZ7ju4iV5nLMBxwdTwWds5Wl+9Wd7nKmVCB2Ny+RQdEezGtsoV37wNYM8LZy7p936JmhXM8PyiCXcvWOXKJ1Z5oRnsywdVAeCGXw4vqQJfsWPwVf+7aPaP3SoZ3Kobb5t+R5vD+HOt3Nl97T3jxKzivvJte4NoXF5pcmJMLc4ITnOAEJzhWONZzq/xfJjV/0o1JuaUGxDid4AQnOMEJTnAlT5lKzK1yyiSnTDJaBSc4wQlOcHLKJKdM746Tz7fK51tL40DvJBug/4llcMHHlHpcu64Tku0yn2xC/sNY00QO0eGJFNFyv2Io7HPgouPTrm0D5mOZDRLmyjkkxi6vQINlTfBftPcnzcIcLkyb+GH0oYsih3lxuXvpSnRhhEpTYi5cTgTEfR1Ukgf5OikueyBaU1RUX0C6mD4+WVV/jxkCuUoWjVIMDOqBSpJN5pEzhO0ZDCRfUPkfTm60NGeH/LhuJeVjaKhmcJknkUYKo2IXRE7h0dEzcSXbZYowgmeL3+Vc/5zT5IIvudEQDkKD6FQhUxqnqHPIzGf9VEXLME0IIsdA3R4bOeRPRhCELofrpjKSXCkOvyzC/a9AUi7C8CI6DwgVSHf+ZSnx+ZbWezLbk6TE0ABH5peMLfPyAkdwghOc4AQnOMEJTnCCE5zgBCc4wQlOcIITnOAEJzjB/b84cLXZv5HKNnDuD7iyjBu4/81gpjzj+gtNIuEqmX1tCAAAAABJRU5ErkJggg==",
+      "type": "fukidashi"
+    },
+    "ヨロシクフキダシ": {
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEVHcEwgK2D///+Vjrne3vU0ieFSAAAAAXRSTlMAQObYZgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAMFJREFUKM91kesNhDAMg+kGOExQM0ELC3Bi/5nOTVoQ6C5Sf+STm4czTb8DwPzKHwTYz7PcJKFSUXAJPBfpkrREzrVLRi4SEgMyDCTMQTLmTOOaqyGAFDQ9BlAPVzTgffCJGsbCI8DVpQOA2ZRldFAPONCnAGrYwIrxRWJXlBrbpI/K++ALY7BdIzSDbOvbQYr2RbPN3a/KTWHDkOZHA3X44duow+WYe6qat6deheV5B23yvJQ9c5XB+7jzC6TpX3wBcecih44aDY0AAAAASUVORK5CYII=",
+      "popup": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJwAAADICAMAAAAqeXieAAAARVBMVEVHcEyIhZH5kjZ5eIqxoqb///+Vjrnhy7ggK2D/68imnp7e3vVNUXXEuKzSxbPh0brw3sEvOGdbXny1q6U+RW6XkZdqa4PpXUcWAAAAAXRSTlMAQObYZgAAAAlwSFlzAAAOwwAADsMBx2+oZAAABJtJREFUeNrtnYt2ojAQhqsU+IN3bff9H3UTEmBygSoFMu5OPEUSoHz+mUsgcvz4MAXsykdXwLJwZrN05n2ndDl/MSC6fd/0sigcnYU7NWe1YwC3U+ebXlwtnGsq9N/uflVqV2gRL0fd+KVOUJe+ulFp1Fmz2RN2cKZotoemU5eTehA4V92OrmPr4U5Nc/9SZ3yrQquoThdDaeFMdUO4uzI968EZC7ypy01bnjrf1WnXNH/MioYz1e3Yjtfro6OjcHgY+2q7uPWNq6kWfXUrtqOxOwJ3b2wva71uhe5iC3Nsmu/dUN2kFK29NQ2B8zZbFUeq24bhWNjmOFHdGk4xLQK3Clydr/wIV9eZ6Qhc7yIM4YgDPw+HyUazAqwHZxvCtYHDtWHYSuESR8yH2+/3KeXgL5wkQVuv1ICUOGI+3H5v6abhnAwjcKQhdcSicEkdulXEJuYzIjxideXqNFK3B7U+z9iwkc09QznRuKa3+g45RaS3Yh7b83EuUC7Va16wQLwV/3CG4J1b3wuO9ZBJRsLvDvfJsLwHnNicwL0epV/ddwm4VwL+i8lB4JaG+zn+ZIN7LjzmgfOlSRWyx/ZwP5taLrjP5+A+M8GFMdq75An2ygoXXy2ygTNM1cGUKsDLD2fQyq5USO61bW4d4Ciaw3vJpVcYlfSnDdk8usxwEZrF49GtKI0PdAtD1q6xcAjHo19lu1aVWkqDyQTOitYSouxYOcA5bxiUc4vOJzLDHTybQ+sNZXngApcqTOBg5bKO0TkrF7jKgGCAs6xM4Gz46OEqu8IHriRwmq4iGSxznDs4/ySpqyq5BOHqYKNbP9gsq2pI/blzK6xyvUNYr6g5jErauaTWylyxYRjuc2WGq10G6+Aqx1bn71Y7XWXza+Vco3LTV9kdoptMq0rnEu01RM0Irrc7e3mDmhWcxXPieYfmjXP0qxmlN1mqGMHVgD+Ry+Gi2qOLDsx+xZ/64gCjeyXjB2WD+0zfkeZwf471nc3X7glvPoPzyt30DHNfXNBkYk4m5gRO4ARO4ASOFRzr3CrfZVLrG90ck9vKIebRCZzACZzACZzA5Rwy5citMmSSIZN4q8AJnMAJnMDJkEmGTO8OJ8+3yvOtueFAV6IdMLxjGzjvMaUBrmvrCcl+iSebkH4YaxnlEJyekCKoDw1jsq8BF5yfdm0nmNMyKRLWsjlEjL1dgYrVMsG9aO8vaoUpON9sws0YpAuUw7pwqbW4Eb2MULFJrAWXIgLCvvYiyYS9LgqXPBGNKSqILyBdTLcvFtXfI0MgFckCL8WIU49EkqQxz8wQbc9gxPi8yD+Z3GhoTrr8vG4l4WPMVRNwiQ8RK4VZ2nnKKUydPaEr2S8RhOF9WvzO5obPHBsXXMgNXNiTBsFQIREal4hzSOSzIVXRMEwNgpBjJG7PVQ7pwQg86VJwfSojxhXD4ZdBePgXiMKFLy+CcYBPgfjgX4YSZ29xvCfZnhglxhwciX8yN8zLBY7ACZzACZzACZzACZzACZzACZzACZzACZzACZzACZzACZzA/b9w4MrW/kYqW+HsD7iy1A3cfzOYKZ7h+gsPr+DPJrkzvgAAAABJRU5ErkJggg==",
+      "type": "fukidashi"
+    }
+  },
+  "globalImages": {
+    "arms": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAzCAMAAADSMboHAAAAXVBMVEVHcEzz3sLVxLbGta/hy7jx3MG2p6ixoqb/68j+7Mz34sT65sa7rKvp1Lzs2cDt2L714MPjzbnr2cLUvLHv2r/96cfr1r314cPgzrrlz7rcyrn55cX758bn0bvl0727YiIiAAAAAXRSTlMAQObYZgAAABBjYU52AAAAKgAAADQAAAABAAAAAeOtgocAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEbSURBVEjH3ZXrkoMgDIUtBvAUpN613cv7P2ZhxFo7rWR/7GX2zCjJ+E1MiJIs89IJZbOid4FRu2g0lQEuWsAgXM2IRgkDM61ktAQ+YfzdiRyjw+SQwwilbuAS3Edq0ArkWsPlyL3lgDWdBWwRNN6DrVKtC/4G9NGsbXAP+hSB6TGitaEgq8JilV+C5f21bs3Ut4Bg6PfBIqH/DNKqo3fKoiPJAysa0q8OYFHXTHCgigc+L0bSE8kfAWcd4sOdHLfgmc4vQRk2egE/qE6CQYeBqGeBHcXNToEV0YmVY19T3XPA4kTUscD3kEAalJX/bG9p7rXQIyWr1yFWmQJLKY+xn5L7F779kQNAp8E441jn6DwMU9hmDn9htO9iVwUmPJ8XmedfAAAAAElFTkSuQmCC",
+    "shield": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAzCAMAAADSMboHAAAAYFBMVEVHcEzlz7rVxLbGta/hy7jx3MHs2cCxoqb/68j+7Mz34sS7rKvt2L62p6jUvLH65sbz3sL55cXgzrrr1r3v2r/14cPl07314MP96cfn0bv758bp1LzNvLLr2cLjzbncyrk4iYGwAAAAAXRSTlMAQObYZgAAABBjYU52AAAAKgAAADQAAAABAAAAAeOtgocAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEhSURBVEjH5ZVxT4MwEMWhtD2OWjrYxuZ07vt/S18pxWw6e8YYTXx/XC/lx7tyJL2qgqigKglZv2cOI7GN2ykSKW7WmO1CUIgNQxagt0hGxc8rSBlkO1nlOfSWG7Y9j0gUK7wQMjhX6c8T9hzsVARVtI4goMWR1g/pzxHJ4OLIl8ZegbPFRBl0+3hYnDGuN47OeQRP3tGcpRQrObouXezlT4As0O+DbUH/BBzMrLr+EOz0OwnBR2PugXhkTki13n5yRoAPKTtpvSuATzfVzbfBlO20HkRn3Gp9LIBG2McvgZu1Yn0HPKB7IscNuiECAR1EpdGUQQIOsZKktIk/TAa+HFtJaaO7VubYtTLwT18AVAaXGSe6R9MwLGFvc1g+2ovYKxP/PBP+q+fBAAAAAElFTkSuQmCC",
+    "head": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAzCAMAAADSMboHAAAAYFBMVEVHcEzp1LzgzrrGta/hy7jlz7rx3MGxoqb/68j+7Mzs2cDt2L67rKu2p6jUvLH65sbVxLb758b34sT96cfv2r/14MPl07314cPjzbnr1r3NvLL55cXn0bvz3sLcyrnr2cI6nHYGAAAAAXRSTlMAQObYZgAAABBjYU52AAAAKgAAADQAAAABAAAAAeOtgocAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEjSURBVEjH3ZXrcoMgEIVVVnBRLl6iSXrJ+79lF0QTM6mQdjqd9vxYRb85uyCyWUYSEWWz5kGBLISNUK6o2ILaIE5sNGhGJdEEUNyC71pLZMZoiygEK9BiYa+gWEEv5qO8uGgpyQKKG/DcNCM5TtqVVpC7RXt+BM41Wu9L/hL15MzvQdWEoBp3R4EujVLqHoyu5U+AmKDfB6uI/jHIIShvYRX/DtjxoDca9ABDUo0HgEMCWC6Zy4fg9e0TYO4e1J+Cbo75c2Ak9RfASOrkySQuT+W+BndmMbCkIjmcqlhqmgenl0MKOHg4mrqGunqFU9nug+vGhbY/Ol/av90eyHnP4dj7DPn+fuzCL/CyWP6hA0DEwdDjks7RuRnGsE0fTm/t+9gH9FE8ho3U/qAAAAAASUVORK5CYII=",
+    "back": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAzCAMAAADSMboHAAAAXVBMVEVHcEz758a7rKvVxLb/68jlz7rx3MGxoqb+7Mzhy7i2p6js2cDGta/65sbp1Lzl073gzrr14cPr2cLjzbncyrnUvLH96cf14MPz3sLr1r3t2L7n0bv34sTv2r/NvLL6rqfmAAAAAXRSTlMAQObYZgAAABBjYU52AAAAKgAAADQAAAABAAAAAeOtgocAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEDSURBVEjH3ZXZjoMwDEUJi+NspRToMp32/z+zzsJQhKaOhEaj9j44CRzda+UhLgqSZFRExQN62effFS7RtMVOygPa1qFrtUF0I4EDmpmcwIN3rMhzjxXuR+cqbLGdLacdUpDB0uME2hCNTs/h8inaeK9QB9v5PRq9BoOVDY73jspAPY4z+QOWJB1WWfqqpQ7rypG9y78AMUP/D9aM3hU8AxyzwJ1Soq4bpX4HQSVFEACuVHkwCvhodQM4beuRJAD6CRThwzfT4+VVjwT2ANFLXBN42nThaq1mK9gsE5vtjh8VvQSPPQ9+pehLJrgTb/dSSB5MMy7rHY3DkMMWczh/tL/GHu5RM0/OfQJ+AAAAAElFTkSuQmCC",
+    "clothes": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAzCAMAAADSMboHAAAAYFBMVEVHcEzx3MHgzrrGta/hy7j34sTz3sKxoqb/68j+7Mz758b65sa7rKvUvLG2p6jt2L7r1r3VxLbcyrnlz7rNvLLr2cL14cPjzbnv2r/l07355cXs2cD14MP96cfp1Lzn0buInG7PAAAAAXRSTlMAQObYZgAAABBjYU52AAAAKgAAADQAAAABAAAAAeOtgocAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFhSURBVEjH3ZXZcoMwDEUxdnIRxuxLSNL0//+ykh3SZaC4D22nvQMCzLEsyQNKEhZ2lARBj0SjBmk/2vOV0hUUGKhtmSR94QkNEaVkyWpniWbwXRpIgC6AaxxpShuaU2o1DY5SO/OrdmyAUkAEsGfQ+UWD5YNELZ+2FJd8jtY5azX11PQCNoUH7eCAFph98AL2HAw5UD/wbK0lRgHF2QAxi0egKMTcryjKomSDUh7lHg8wQt8CUoR+H8x29J9BZYIOR/NQ/mNglh0DeJCB6gvg0z7oA+l2sw5gd44AP6/j+xhjwOjyRBfcL33YKE/1BlRmkpnTaoy1lG1JZmKnN1Ovgs8yvoAnU+fGHNfAMy/4CjLVLRvzAVQ+x0cdTxztdQOs2J4WUFKrV7dQTXlI3IP3Cqg18Boq1GUBrMW72vi4GLzlHqyl5LlSf+0HgH0QocdF/UdDs97Dlj4c0TzurT0CewFfmD3HcP+eKAAAAABJRU5ErkJggg==",
+    "neck": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAzCAMAAADSMboHAAAAV1BMVEVHcEz758bgzrq7rKv/68jp1LzGta/hy7ixoqb+7MzVxLb65sa2p6jUvLH14cPx3MHs2cDcyrnr2cLNvLLlz7rl07314MP34sTt2L7z3sLjzbnr1r3v2r/7a/xfAAAAAXRSTlMAQObYZgAAABBjYU52AAAAKgAAADQAAAABAAAAAeOtgocAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADeSURBVEjH7dXbEoIgFAVQL8lxi3ez+/9/ZweIwdLCGWtqnPYDA7rgwAsEASf1JDDR/QgQ3IjB72wwcssxbBUsJFB2NSALhg1qJy1skTGUCgBRIWWGHr1bMrVQlGwFTIQuDZm74g4qJGTJgw4NT8sQoc4noD6QqtulJbcN77Fw0sI85iaOVcf0cv1JD+6gNx+BmJHvw40n64Yh0db2E6L98xUPRLvxnAdY0USqJdDmSHSadeoz0eU1TMaVk8UwHBYM3wH/e/zJPa7iAkj98PbGzbpHzWPoY8N3eP7T7mFX3/g0IA/kOCcAAAAASUVORK5CYII=",
+    "hand": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAzCAMAAADSMboHAAAAUVBMVEVHcEzs2cDgzrq2p6jhy7jx3MHGta+xoqb/68j+7My7rKvVxLbz3sLUvLHl07314cP34sT65sblz7r55cXp1Lz96cfNvLLcyrnv2r/jzbnr2cK0vogKAAAAAXRSTlMAQObYZgAAABBjYU52AAAAKgAAADQAAAABAAAAAeOtgocAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADbSURBVEjH3dXZDoMgEAVQka0DirVubf//QzsibtVkSFpj2vswkngEJjGQJBhNJBnixymoUFYBNlO9gs8CwGkoARhn+GDzpCPs8pz1WiGHAscWUruAeoQ+qiv7iu8tQjUtjXKCrTHOz+UmaNs9OOzR4eYCzHG7W8hNKNxgNdyPDef8HZI5BEJEzocXIv8BGwo2ElMLke3CTGwSCR+yomCNK9PNSCFkVNffg9umxe0zeF4zcmeP4Yuj4YFd3yPgdf3D0rCKhNnvnhSahuGOizpHh8uQYst7OP5qJ9gLSKI7pznd1JMAAAAASUVORK5CYII=",
+    "boots": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAzCAMAAADSMboHAAAAYFBMVEVHcEz758bp1Lzt2L7/68j34sTz3sKxoqbhy7j+7Mzlz7rx3MG7rKvs2cDGta/VxLb14cPUvLH65sbjzbn14MO2p6jr2cL55cXl073r1r396cfNvLLgzrrn0bvv2r/cyrmjK6ahAAAAAXRSTlMAQObYZgAAABBjYU52AAAAKgAAADQAAAABAAAAAeOtgocAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAE/SURBVEjH1ZXpdoMgEIUDgjAqixq1Wdq+/1t2Bpdo2wg/7OnJPXFE8s3cOBI5nVAqotMoGgLJbr4F8w0dZ71SPVgD0NzrBsBbyqx7Gs3kCPZU0cG9NtA0tYO3G3g6PUpOPqCUgQqjA/LEAz+hrJtItVgbcPBJ7t7esBT01lOe2YIh13qMBmtCYzEPHF3XG7BCdeGMsasqmusqul5+pErUn4CQoP8HRUQvCOblOUQZA7nOQiyFyDSXWue/g5melaeDlwlkQ8Sa6wuBss0jYKE/EOSz+w9wVCmuGGQYy33wrPVAYCufNbwI7pjSCgTfmdgHc60L9rw9bO5OQY2Sh4A8WCPIE0HJEq3FQeCqjweB5bLMHjfDZBwcpucetb7ugmX4fwWQltC8fF7oTaHi4LTHJb1HV7vwDrbah9O39hj2BUN0NdjxQmJAAAAAAElFTkSuQmCC",
+    "ハピネスワンピ": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAAtUExURf8A/yArYP///6nL/2SG4HSEn7bH187f705HYGdngV5YhG1nkUE0Tpiow////zcOft0AAAABdFJOUwBA5thmAAAAAWJLR0QOb70wTwAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAAd0SU1FB+gMAQoSDUBdMJMAAAFPSURBVCjPjZBBSwJBFMe3g2K3pG/wwpmDXcJP0DcQ4c1SGMjC7AbeBnYluniKcTXoEil4DZbdunjQ2OkUCFrnIAK/S7O6u+qtxzyY92Pee//5G8ZOHJTLR8YegNr5Pjg5PkuvrNPhGtQyUHARzboGWUtRIsqWBtnQoielo0G+pOAAePWd8SN0PBxt60MBiEAfcvBEqR8IcZM/QI8wbjmYPZE9dG9nJg5lCvrBIxILL/y3TV1Scc8CIMNIddd1pMIla0/5OFRxQvoqDpbcttnYj1TSdBeHL3MOwJqfYXStVSsaDlilOmnwRShU3Si0lTu3KsRqkKappvpD2H5HsEEf/JpissY6laxRnVS4/CAbIQv/mdk2vwwGqRniJ1zHPd1YUgRXK9BqTGildgn6q9SroJlpV0CBWCDgOzMEV4IKusLcsVIUd5PcAim7SRr/ij8bqnkgHiR8PwAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyNC0xMi0wMVQxMDoxODoxMyswMDowMF2SPZUAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjQtMTItMDFUMTA6MTg6MTMrMDA6MDAsz4UpAAAAKHRFWHRkYXRlOnRpbWVzdGFtcAAyMDI0LTEyLTAxVDEwOjE4OjEzKzAwOjAwe9qk9gAAAABJRU5ErkJggg==",
+    "ゆるうさパーカー桃": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAA5UExURf8A/2uEoLdneYikvUxMTOOAkaXE2/+gvc3h72RkZP/P3ujh4/v9/7alr5qDi9XGyFZWVnR0dP///1XYqSEAAAABdFJOUwBA5thmAAAAAWJLR0QSe7xsAAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAAd0SU1FB+gMAQoZLO/A+QYAAAFNSURBVDjLrZPRlsMgCEQTiGIEJfv/P7uDpmm3zb6VB0HnChPPybJ8NdYz/pFp5XVDINGtnjhvI/Ka6E4XLnsM2AvLDUEVwLbrvm8AKt00qCkXa7aVnOpnC5Jaq2Q1zdBRfgAgzCRzZjGD/gEkIs41MeZnJnofQSoEkwlrIpgkUXqzoCS5QE0kJUtceNW7ugxAksgAxLW/6qZNtOQKGR6KSsPRRTQzAI6bNgKdHIBZO/Wovbk/Ozi249Y5ICa4AlBH0gCihY4hrXdWxV6VOYCZ44Zy7w0GNLMPAD1DnxkjGS8fQC7MwdsTsOjJEKwv3ZHRwCfgjwItQoCLjhwN57cgfJINZnk8BTIceERwsXiYbRCWE+g4nPeGNsrWH4CbL/geDWMdEYYV1RDGQ/U+V8S2LMesLuGK42c/jgB2FNvNf3H4eQ7S74Dxz/wpvhS/ujQWHwVNQvoAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjQtMTItMDFUMTA6MjU6NDQrMDA6MDC8yeDOAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDI0LTEyLTAxVDEwOjI1OjQ0KzAwOjAwzZRYcgAAACh0RVh0ZGF0ZTp0aW1lc3RhbXAAMjAyNC0xMi0wMVQxMDoyNTo0NCswMDowMJqBea0AAAAASUVORK5CYII=",
+    "魔王妃のドレス": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAABFUExURf8A/z44VFBIbTYrOFc0WmpcjoR3rqh0q4NTiLbH14mVrv///6I8Si0yPT9GU/p3cGFrfk1VZmpCbiArYPhXefeltrlLYwx3rt8AAAABdFJOUwBA5thmAAAAAWJLR0QLH9fEwAAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAAd0SU1FB+gMAQoVE/UTmzcAAAFsSURBVDjLlZKNcoMgEIQRzwqYJRVt3/9Ru3uaRNpOZwqKwn7eryH8awwaf+mRevyFGM1OYHqbTsBsvBLzgTxdmM1jZyJZGk8n3f7i5Pgi5nha7PVQsn8xLbc8uYVcev225BE1xHIvMVSMebl1BM+Xgncglgg+ubt3gBWaxIpchpL5pMtiV92DRkUteeEKT+NF2NxSY4xUCEgPI0/mB2EtmReKtrFAHlQoS+0gIAcCUFeshTdNEJATSF+rWeOUAYbpa/ATqzIGprWae6hMMPKu7sNWpg33QYEojC/DNHClaawH6AB00aqAKEDRnaePIa8NsDY0A5oi+v7TKGYFzolrkS7VYrLNp8ryU1fpZiFpVmFFbNt29dCSa6L4TmDb9/1JMDxLYprUxB22/eNFoKqcjO+4VMQqAy8AIHEwTS8V6ABviXfFvANqwrb7fALeEyoV3gMC2+f+ec1DTGCrwtmiPotLzR/jWww/x3aMLxLHF84YETv5AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDI0LTEyLTAxVDEwOjIxOjE5KzAwOjAwnBUvEAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyNC0xMi0wMVQxMDoyMToxOSswMDowMO1Il6wAAAAodEVYdGRhdGU6dGltZXN0YW1wADIwMjQtMTItMDFUMTA6MjE6MTkrMDA6MDC6XbZzAAAAAElFTkSuQmCC",
+    "女用トゥエハロウィッカRe": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAB4UExURf8A/0pNZPr66dTS0tWVZMF6XIR8lv/Ndf/zj5ZdRy0uNeqxbD59cFvJvJZKQEZNbOeGO9ppPDg5Pf/EUvSjOmZynUZARVxkhU9PZHEnLeXRa8WoVPrii6aAPc5MPkNEWiMjIyArYPhXefeltkpHVVNXbrlLY////yr1o4kAAAABdFJOUwBA5thmAAAAAWJLR0QnLQ+oIwAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAAd0SU1FB+gMAQoWLoZWhOUAAAG8SURBVDjLdZOBeqMgEIS1J8XFRAQVOUkCete+/yPeLJrUtLlJvuRj92cdRi3Kh4rXKss31q//EjvARFFVlWD9AMrynX8qKWXNemLuACZI7CdI1FK89FCpXaL+Cby9l2Utt35T14145YEvfzplF9V3oNwAKc5nAaMk2gPwENUVnU/wSLrr2uJZbWesIupPp55IWfMdaI0x1lLfd33fk7VYHoi2bc1grNbj2EHOaW1RQHnvD6wNGMfJewaGocOU3xuAqT0Aq2fPckFbO6DUdTuARc8elbsACcFZuAQw7EBBhgciQueul8vVAVAZoL0vJZvOQPDu4jyAmzG3m8wEIdmmbVFUYfbOuTlYJm4I9kFIWSlUHbbzEAYqJC6/riFxBvQ9e2AgWsW35J4UUbJRq2kM7GF2TuGgiegry4SUtAphmjioOSgdQSzLcuxH5TyAkaNSEcSyrutOJPS1vc4zA5Of56vVcVn/3AkeEHXC5jnL+7+JgfUBoA9AeP/xwV/vBUrPAGakpsmPY41/mYH82YDIAO2AbCQxsHyun9s5VLQopILyW4N3R2Tbh1OolGJMx0cQ64MHLkBPQOKYWP8ACgAwRhSCXi4AAAAldEVYdGRhdGU6Y3JlYXRlADIwMjQtMTItMDFUMTA6MjI6NDYrMDA6MDDJiuqeAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDI0LTEyLTAxVDEwOjIyOjQ2KzAwOjAwuNdSIgAAACh0RVh0ZGF0ZTp0aW1lc3RhbXAAMjAyNC0xMi0wMVQxMDoyMjo0NiswMDowMO/Cc/0AAAAASUVORK5CYII=",
+    "和美人・ナデシコ": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAABLUExURf8A/7bH13SEn2dngejy///R6P+i0blqn////8MqLudKRvVxYEZGcTI6Vkpcj4ad3WZ4q15YhNeLNfLDZyArYGRBN/hXefeltrlLYwFTe3sAAAABdFJOUwBA5thmAAAAAWJLR0QIht6VegAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAAd0SU1FB+gMAQoZH1AQmBAAAAFcSURBVDjLrZLrkoIwDIVpqIVqU3qD9f2fdE9SRHT13wbGSXI+ctqMw/C/YQyNI32VaTTWGmO+IdAvCOe+EUQXNyGco48AmZkciIsjaz8QnuZZCOiS+D+696YTos8o3w2uNxCY3fXbld4P4K+eDC4puhSGXnVpYkcKmBn6fCZI7T10i0ChJz4R6kuwkE2Kke+dlwFQRqyZSHdt7HkEmqKbcISMgX6MYCD4Mj70iEmQ+dBDYFkvH6EVugeAnrWBl8TLwmnhYC1aD4BDZi15iQLERQvmvBMAMg/aTNJPmg6cd4BLyFWBoIq8Ys8158I6oNYiFnoJUaObxKK01jqQ64rfmGIHYnJCDG3btgaghFoAxPQANKnctp9OrEV0TujjS+4kJsiAPmJdBx2Q4iTeAsBiegJ6FQXUYgdC2/TZARz9dEhNWrtv99aO/4Qgsh+5T0/ayWFH+Jy8nuFDtB6/OSQaQAvBU6EAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjQtMTItMDFUMTA6MjU6MzErMDA6MDDkNMZwAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDI0LTEyLTAxVDEwOjI1OjMxKzAwOjAwlWl+zAAAACh0RVh0ZGF0ZTp0aW1lc3RhbXAAMjAyNC0xMi0wMVQxMDoyNTozMSswMDowMMJ8XxMAAAAASUVORK5CYII=",
+    "月夜のナイトウェア白": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAQlBMVEVHcEzG7PWd2fX86q3NsnXt04X9+viJeVeulGLAp5fw4dfbx8E4VnSCveZekLxRcJDc9/yiZFb+8s27jGf/8ZTqy3jagq/yAAAAAXRSTlMAQObYZgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAYpJREFUOMutU1l2wzAIDAgEaPGa3v+qHdlp2iztV/VebAlGw3gIl8v/LjvXb2l3l7Hwfp/v6oakufY3iAjlJEcFSawRz/lclDdQGAg21pJfEFUTHRSCt9Z4rVESbWnf17RRKvFGRM4b7dfrvtKWXwpAo0WUbd2vH+tWjtOTArMCjoMB94vZowpcge6Itq4rLuObHigAzzXCpU1zm5uJRyBy99ycGT6JyzwAU8MOTjH7DWHSSVVHfmo8WMRxpi5fAGZNSc8KfFKMALOd+kpnQcDVW5t4ag075IV7GUqjlDr6rKbOAzCzYz+6XsvhaNSS0WRDEZoHgFAAPfNcbl7AoJpDkzDhemvEkjQQuxsOGbmWJET4ClqIJJWayw+rbBiDCtROgOsw7vu/aV4FHM6UM34A4L5UvztpHlAkxEteAFggArrDv7x2MbcqTpwPQCZ2qYiJ3wq4AOzW+5LpfNgIwImDwnT0ScfA9N4v44H9EdOzBg5w9nGeDN6LfquES08AePVzBl8H8o8RfVyfEl0Sb4V/g+MAAAAASUVORK5CYII="
+  },
+  "characters": [
+    {
+      "details": {
+        "name": "kaikoing",
+        "hair": "ガールズヘアＧ",
+        "makeup": "ガールズメイクＡ",
+        "element": "木",
+        "thumbnail": "hapinesuwanpi"
+      },
+      "outfitList": [
+        {
+          "json": "hapinesuwanpi",
+          "thumbnail": "ハピネスワンピ"
+        },
+        {
+          "json": "yuruusapa-ka-momo",
+          "thumbnail": "ゆるうさパーカー桃"
+        },
+        {
+          "json": "maouhinodoresu",
+          "thumbnail": "魔王妃のドレス"
+        },
+        {
+          "json": "twueharowikka",
+          "thumbnail": "女用トゥエハロウィッカRe"
+        }
+      ]
+    },
+    {
+      "details": {
+        "name": "fuddyduddy",
+        "hair": "ガールズヘアＤ",
+        "makeup": "ルゥ",
+        "element": "闇",
+        "thumbnail": "wabijinnadeshiko"
+      },
+      "outfitList": [
+        {
+          "json": "wabijinnadeshiko",
+          "thumbnail": "和美人・ナデシコ"
+        }
+      ]
+    },
+    {
+      "details": {
+        "name": "nostalgeek",
+        "hair": "チャピツイット",
+        "makeup": "ハニハニ",
+        "element": "火",
+        "thumbnail": ""
+      },
+      "outfitList": [
+        {
+          "json": "",
+          "thumbnail": ""
+        }
+      ]
+    },
+    {
+      "details": {
+        "name": "retrophile",
+        "hair": "トレスメルルゥ",
+        "makeup": "ロックオンハーツ",
+        "element": "水",
+        "thumbnail": "tsukiyononaitoweashiro"
+      },
+      "outfitList": [
+        {
+          "json": "tsukiyononaitoweashiro",
+          "thumbnail": "月夜のナイトウェア白"
+        },
+        {
+          "json": "",
+          "thumbnail": ""
+        }
+      ]
+    },
+    {
+      "details": {
+        "name": "throwbacker",
+        "hair": "デッセルカール",
+        "makeup": "ピピ",
+        "element": "光",
+        "thumbnail": ""
+      },
+      "outfitList": [
+        {
+          "json": "",
+          "thumbnail": ""
+        }
+      ]
+    },
+    {
+      "details": {
+        "name": "oldfashioned",
+        "hair": "",
+        "makeup": "",
+        "element": "",
+        "thumbnail": ""
+      },
+      "outfitList": [
+        {
+          "json": "",
+          "thumbnail": ""
+        }
+      ]
+    },
+    {
+      "details": {
+        "name": "museumpiece",
+        "hair": "",
+        "makeup": "",
+        "element": "",
+        "thumbnail": ""
+      },
+      "outfitList": [
+        {
+          "json": "",
+          "thumbnail": ""
+        }
+      ]
+    },
+    {
+      "details": {
+        "name": "vintagist",
+        "hair": "",
+        "makeup": "",
+        "element": "",
+        "thumbnail": ""
+      },
+      "outfitList": [
+        {
+          "json": "",
+          "thumbnail": ""
+        }
+      ]
+    },
+    {
+      "details": {
+        "name": "classicsoul",
+        "hair": "",
+        "makeup": "",
+        "element": "",
+        "thumbnail": ""
+      },
+      "outfitList": [
+        {
+          "json": "",
+          "thumbnail": ""
+        }
+      ]
+    },
+    {
+      "details": {
+        "name": "antimodern",
+        "hair": "",
+        "makeup": "",
+        "element": "",
+        "thumbnail": ""
+      },
+      "outfitList": [
+        {
+          "json": "",
+          "thumbnail": ""
+        }
+      ]
+    }
+  ],
+  "articles": {
+    "message-info": "チョコットランドのコーデをひたすら紹介するサイトです[|ファイトフキダシ]\n[|アリガトフキダシ]<strong><a href=\"https://chocottoland.hange.jp/\" target=\"_blank\">チョコットランド - オンラインRPG</a></strong>[|ヨロシクフキダシ]\n\n\n<small>当サイトに掲載されているチョコットランドの画像の著作権は、<a href=\"https://coconev.co.jp\" target=\"_blank\">cocone v 株式会社</a>に帰属します。</small>",
+    "more": "テストテスト"
+  }
+}
