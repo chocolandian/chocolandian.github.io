@@ -18,7 +18,7 @@ import {
             width: var(--main-view-width);
             background-color: var(--view-background-color);
         }
-        @media (height < 480px) {
+        @media (height < 480px) or (width < 630px) {
             #character-view {
                 top: 5px;
                 height: 135px;
@@ -31,14 +31,14 @@ import {
             margin: 0 30px;
             height: 100%;
         }
-        @media (height < 480px) {
+        @media (height < 480px) or (width < 630px) {
             #character-gears {
                 .outfit {
                     margin: -20px -10px -10px -5px;
                 }
             }
         }
-        @media (width < 540px) {
+        @media (width < 630px) {
             #character-gears {
                 display: grid;
                 width: 320px;
@@ -125,13 +125,13 @@ import {
                 margin: 10px;
             }
         }
-        @media (height < 480px) {
+        @media (height < 480px) or (width < 630px) {
             #message-view {
                 top: 150px;
                 height: calc(100% - 160px);
 
                 >section {
-                    margin: 0 10px 5px;
+                    margin: 0 5px 5px;
                 }
             }
         }
@@ -175,7 +175,7 @@ import {
                 transform: translateY(0);
             }
         }
-        @media (height < 480px) {
+        @media (height < 480px) or (width < 630px) {
             #message-tab-bar {
                 padding-top: 7px;
             }
@@ -379,7 +379,7 @@ import {
                 }
             }
         }
-        @media (width < 540px) {
+        @media (width < 630px) {
             #overlay-404 {
                 br {
                     display: none;

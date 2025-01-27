@@ -268,6 +268,7 @@ const popup = Util.elementize(/*html*/`
         #popup {
             z-index: 9999999;
             position: absolute;
+            touch-action: pinch-zoom;
 
             &.closed {
                 visibility: hidden;
@@ -360,7 +361,7 @@ Create.itemSlot = ({
             }
             .item-icon {
                 z-index: 2;
-                touch-action: none;
+                touch-action: pinch-zoom;
             }
         }
 
@@ -569,6 +570,7 @@ Create.scrollableSection = (isDiscretely = false) => {
             width: 100%;
             border-top-left-radius: var(--view-radius);
             border-bottom-left-radius: var(--view-radius);
+            touch-action: pinch-zoom;
 
             &:not(.completed) .page {
                 visibility: hidden;
@@ -622,6 +624,7 @@ Create.scrollableSection = (isDiscretely = false) => {
                 border: 1px solid rgb(58, 188, 203);
                 background-color: rgb(95, 255, 234);
                 border-radius: 3px;
+                touch-action: pinch-zoom;
             }
             &.disabled .scrollbar-thumb {
                 visibility: hidden;
@@ -902,7 +905,7 @@ Create.characterSlot = ({
                 }
             }
         }
-        @media (width < 540px) {
+        @media (width < 450px) {
             .character-slot {
                 .outfit {
                     margin-left: -15px;
@@ -957,6 +960,7 @@ Create.view = (() => {
                 border: 3px solid var(--view-border-color);
                 border-radius: var(--view-radius);
                 color: var(--view-border-color);
+                z-index: ${topMostZIndex};
 
                 &.closed {
                     display: none;
@@ -964,8 +968,8 @@ Create.view = (() => {
                 &.horizontally-center {
                     position: absolute;
                     margin: 0 auto;
-                    left: -999%;
-                    right: -999%;
+                    left: 0;
+                    right: 0;
                 }
                 >h2 {
                     flex-shrink: 0;
@@ -1000,6 +1004,7 @@ Create.view = (() => {
         Object.assign($('h2', rootElement), {
             onDragMove(event) {
                 Util.moveElementToCursor(event, rootElement);
+                rootElement.style.margin = 0;
             },
         });
 
@@ -1014,6 +1019,7 @@ Create.view = (() => {
                 Object.assign(rootElement.style, {
                     left: '',
                     top: '',
+                    margin: '',
                 });
             },
 
