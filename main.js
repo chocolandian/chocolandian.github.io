@@ -137,7 +137,11 @@ import {
         }
 
         #message-tab-bar {
-            padding: 10px var(--view-radius) 0;
+            padding: 0 var(--view-radius);
+            height: 33px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-end;
             user-select: none;
             position: relative;
 
@@ -148,7 +152,6 @@ import {
                 background-color: var(--scrollbar-track-color);
                 color: var(--view-background-color);
                 font-weight: bold;
-                float: left;
 
                 &.selected {
                     background-color: var(--view-border-color);
@@ -173,11 +176,6 @@ import {
             }
             100% {
                 transform: translateY(0);
-            }
-        }
-        @media (height < 480px) or (width < 630px) {
-            #message-tab-bar {
-                padding-top: 7px;
             }
         }
 

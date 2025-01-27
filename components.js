@@ -292,11 +292,11 @@ const popup = Util.elementize(/*html*/`
 
         moveToCursor(pointerEvent) {
             const { pageX, pageY } = pointerEvent;
-            const maxLeft = $('html').clientWidth - popup.offsetWidth;
-            const maxTop = $('html').clientHeight - popup.offsetHeight;
+            const maxLeft = $('main').clientWidth - popup.offsetWidth;
+            const maxTop = $('main').clientHeight - popup.offsetHeight;
 
-            popup.style.left = `${ Util.clampNum(0, pageX, maxLeft) }px`;
-            popup.style.top = `${ Util.clampNum(0, pageY, maxTop) }px`;
+            popup.style.left = `${ Util.clampNum(0, pageX - $('main').offsetLeft, maxLeft) }px`;
+            popup.style.top = `${ Util.clampNum(0, pageY - $('main').offsetTop, maxTop) }px`;
             popup.show();
         },
 
@@ -312,7 +312,7 @@ const popup = Util.elementize(/*html*/`
             popup.hide();
         },
     });
-    $('body').append(popup);
+    $('main').append(popup);
 }
 
 
@@ -982,6 +982,7 @@ Create.view = (() => {
                     margin: -1px -1px 0;
                     text-indent: 0.25em;
                     user-select: none;
+                    touch-action: pinch-zoom;
                 }
                 >section {
                     margin: 5px;
