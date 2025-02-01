@@ -106,7 +106,7 @@ const Util = {
         waitForEnd((event) => {
             const wheelDeltaThreshold = 10;
             if (Math.abs(event.deltaY) > wheelDeltaThreshold) {
-                event.target.closest('.onWheelEnd')?.onWheelEnd?.(event);
+                event.target.closest('.onWheelEnd')?.onWheelEnd(event);
             }
         }),
         { passive: true }
@@ -118,7 +118,7 @@ const Trigger = {
     onItemDrop(pointerEvent) {
         const {pageX, pageY} = pointerEvent;
         const dropTarget = document.elementFromPoint(pageX, pageY);
-        dropTarget.closest('.onItemDrop')?.onItemDrop?.(pointerEvent.target, dropTarget);
+        dropTarget.closest('.onItemDrop')?.onItemDrop(pointerEvent.target, dropTarget);
     },
 
     onMainJsonLoaded(json) {
@@ -154,7 +154,7 @@ const Trigger = {
 
     const propagateDragEvent = (eventType, event, ...args) => {
         let ancestor = event.target;
-        while (event.defaultPrevented || ancestor?.parentNode?.closest) {
+        while (event.defaultPrevented || ancestor?.parentNode) {
             ancestor[eventType]?.(event, ...args);
             ancestor = ancestor.parentNode.closest('.shouldCaptureBubblingDragEvent');
         }
@@ -715,7 +715,7 @@ Create.scrollableSection = (isThumbPositionDiscrete = false) => {
             })();
 
             if (currentPageIndex !== newIndex) {
-                pages[currentPageIndex]?.classList?.remove?.('active');
+                pages[currentPageIndex]?.classList.remove('active');
                 pages[newIndex].classList.add('active');
                 currentPageIndex = newIndex;
             }

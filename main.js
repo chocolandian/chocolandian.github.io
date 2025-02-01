@@ -288,7 +288,7 @@ import {
             switchTabPanel();
         },
         onOutfitJsonLoaded(json, name) {
-            $('.equipped', messageView.tabPanels.character)?.classList?.remove?.('equipped');
+            $('.equipped', messageView.tabPanels.character)?.classList.remove('equipped');
             $(`[data-href="${ name }"]`, messageView.tabPanels.character).classList.add('equipped');
             messageView.open();
         },
