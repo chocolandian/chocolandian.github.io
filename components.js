@@ -154,7 +154,7 @@ const Trigger = {
 
     const propagateDragEvent = (eventType, event, ...args) => {
         let ancestor = event.target;
-        while (ancestor?.parentNode?.closest) {
+        while (event.defaultPrevented || ancestor?.parentNode?.closest) {
             ancestor[eventType]?.(event, ...args);
             ancestor = ancestor.parentNode.closest('.shouldCaptureBubblingDragEvent');
         }
@@ -547,7 +547,7 @@ Create.outfit = (image, isReverse = false, isSitting = false, isAttacking = fals
 
 
 
-Create.scrollableSection = (isDiscretely = false) => {
+Create.scrollableSection = (isThumbPositionDiscrete = false) => {
     Util.addStyleRules(/*css*/`
         .scrollable-section {
             position: relative;
@@ -660,8 +660,6 @@ Create.scrollableSection = (isDiscretely = false) => {
     };
 
     let pages;
-    let currentPageIndex;
-
     const replaceChildren = (...staticElementList) => {
         const createPage = (firstChild) => {
             const page = document.createElement('div');
@@ -694,32 +692,40 @@ Create.scrollableSection = (isDiscretely = false) => {
         pages = [...scrollable.children];
         scrollbar.classList[pages.length < 2 ? 'add' : 'remove']('disabled');
 
-        currentPageIndex = -1;
-        moveThumb();
+        updateThumbPositionAndPage();
     };
 
 
-    const moveThumb = (pageDelta = 0, thumbTop = null) => {
-        const factor = (pages.length - 1) / maxThumbTop;
-        if (factor <= 0) {
-            return;
-        }
-        const _newIndex = (thumbTop === null)
-            ? currentPageIndex + pageDelta
-            : Math.round(thumbTop * factor);
-        const newIndex = Util.clampNum(0, _newIndex, pages.length - 1);
+    const updateThumbPositionAndPage = (() => {
+        let currentPageIndex;
+        return ({ pageDelta = 0, thumbTop = null } = {}) => {
+            const indexRatio = (pages.length - 1) / maxThumbTop;
+            if (indexRatio <= 0) {
+                return;
+            }
+            const newIndex = (() => {
+                if (pageDelta === 0 && thumbTop === null) {
+                    currentPageIndex = null;
+                    return 0;
+                }
+                const _newIndex = (thumbTop === null)
+                    ? currentPageIndex + pageDelta
+                    : Math.round(thumbTop * indexRatio);
+                return Util.clampNum(0, _newIndex, pages.length - 1);
+            })();
 
-        if (currentPageIndex !== newIndex) {
-            currentPageIndex = newIndex;
-            pages.forEach((page) => page.classList.remove('active'));
-            pages[currentPageIndex].classList.add('active');
-        }
+            if (currentPageIndex !== newIndex) {
+                pages[currentPageIndex]?.classList?.remove?.('active');
+                pages[newIndex].classList.add('active');
+                currentPageIndex = newIndex;
+            }
 
-        const newTop = (thumbTop === null || isDiscretely)
-            ? currentPageIndex / factor
-            : thumbTop;
-        scrollbarThumb.style.top = `${ Util.clampNum(0, newTop, maxThumbTop) }px`;
-    };
+            const newThumbTop = (thumbTop === null || isThumbPositionDiscrete)
+                ? currentPageIndex / indexRatio
+                : thumbTop;
+            scrollbarThumb.style.top = `${ Util.clampNum(0, newThumbTop, maxThumbTop) }px`;
+        };
+    })();
 
 
     const overwrite = (text, json) => {
@@ -764,52 +770,52 @@ Create.scrollableSection = (isDiscretely = false) => {
         replaceChildren(...articleElement.children);
     };
 
+    {
+        let swipeStartY = null;
+        Object.assign(scrollable, {
+            onResizeEnd,
+            shouldCaptureBubblingDragEvent: true,
 
-    let swipeStartY = null;
+            onDragStart(event) {
+                swipeStartY = (event.pointerType === 'touch' && !event.target.matches('.item-icon'))
+                    ? event.pageY
+                    : null;
+            },
+            onDragEnd(event) {
+                if (swipeStartY === null) {
+                    return;
+                }
+                const swipeDeltaY = swipeStartY - event.pageY;
+                swipeStartY = null;
 
-    Object.assign(scrollable, {
-        onResizeEnd,
-        shouldCaptureBubblingDragEvent: true,
-
-        onDragStart(event) {
-            swipeStartY = (event.pointerType === 'touch' && !event.target.matches('.item-icon'))
-                ? event.pageY
-                : null;
-        },
-        onDragEnd(event) {
-            if (swipeStartY === null) {
-                return;
-            }
-            const swipeDeltaY = swipeStartY - event.pageY;
-            swipeStartY = null;
-
-            const minSwipeDeltaY = 40;
-            if (Math.abs(swipeDeltaY) > minSwipeDeltaY) {
-                moveThumb(Math.sign(swipeDeltaY));
-            }
-        },
-    });
+                const minSwipeDeltaY = 40;
+                if (Math.abs(swipeDeltaY) > minSwipeDeltaY) {
+                    updateThumbPositionAndPage({ pageDelta: Math.sign(swipeDeltaY) });
+                }
+            },
+        });
+    }
 
     Object.assign(scrollbar, {
         onDragEnd(event) {
             const clickedBarTop = event.offsetY;
             if (0 <= clickedBarTop && clickedBarTop <= maxThumbTop) {
-                moveThumb(0, clickedBarTop);
+                updateThumbPositionAndPage({ thumbTop: clickedBarTop });
             } else {
-                moveThumb(Math.sign(clickedBarTop));
+                updateThumbPositionAndPage({ pageDelta: Math.sign(clickedBarTop) });
             }
         },
     });
 
     Object.assign(scrollbarThumb, {
         onDragMove(event) {
-            moveThumb(0, scrollbarThumb.offsetTop + event.movementY);
+            updateThumbPositionAndPage({ thumbTop: scrollbarThumb.offsetTop + event.movementY });
         },
     });
 
     Object.assign(rootElement, {
         onWheelEnd(event) {
-            moveThumb(Math.sign(event.deltaY));
+            updateThumbPositionAndPage({ pageDelta: Math.sign(event.deltaY) });
         },
         replaceChildren,
         overwrite,
@@ -939,7 +945,7 @@ Create.view = (() => {
                 z-index: ${topMostZIndex};
 
                 &.closed {
-                    display: none;
+                    visibility: hidden;
                 }
                 &.horizontally-center {
                     position: absolute;
