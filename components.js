@@ -742,49 +742,25 @@ Create.scrollableSection = (isDiscretely = false) => {
                 const itemNames = $1.split('|');
                 const shortName = itemNames[0];
                 const fullName = itemNames[1] || shortName;
-                return `[${ fullName }]${ shortName }`;
+                return `<temp-item-slot>${ fullName }</temp-item-slot>${ shortName }`;
             })
             .replace(/(、)\[/g, ($0, $1) => {
                 return `<span class="comma-before-item-icon">${ $1 }</span>[`;
             })
             + '</div>');
 
-
-        const createIconFromItemName = (fullName) => {
-            const item = json.items[fullName];
+        for (const tempItemSlot of $$('temp-item-slot', articleElement)) {
+            const item = json.items[tempItemSlot.textContent];
             const isFukidashi = item.type === 'fukidashi';
-            return Create.itemSlot({
+            const itemSlot = Create.itemSlot({
                 itemImageSrc: item.icon,
+                popupImageSrc: item.popup,
                 isDraggable: false,
                 isFukidashi,
                 isShadowed: !isFukidashi,
-                popupImageSrc: item.popup,
             });
-        };
-
-        const iconizeBracketedItemName = (node) => {
-            let child = node.firstChild;
-            while (child) {
-                const nextSibling = child.nextSibling;
-
-                if (child.nodeType === Node.TEXT_NODE) {
-                    const splitText = child.nodeValue.split(/\[(.+?)\]/g);
-
-                    const fragment = new DocumentFragment();
-                    splitText.forEach((partOfText, index) => {
-                        fragment.append(index % 2 === 1
-                            ? createIconFromItemName(partOfText)
-                            : document.createTextNode(partOfText)
-                        );
-                    });
-                    child.replaceWith(fragment);
-                } else {
-                    iconizeBracketedItemName(child);
-                }
-                child = nextSibling;
-            }
-        };
-        iconizeBracketedItemName(articleElement);
+            tempItemSlot.replaceWith(itemSlot);
+        }
         replaceChildren(...articleElement.children);
     };
 
