@@ -581,7 +581,7 @@ Create.scrollableSection = (isThumbPositionDiscrete = false) => {
             .emoji {
                 text-shadow: 1px 1px var(--view-border-color);
             }
-            .comma-before-item-icon {
+            .compact-punctuation {
                 margin-right: -6px;
             }
         }
@@ -744,14 +744,14 @@ Create.scrollableSection = (isThumbPositionDiscrete = false) => {
             })
             .join('')
             .replace(emojiRegex, '<span class="emoji">$&</span>')
+            .replace(/(、)(\[|「)/g, ($0, $1, $2) => {
+                return `<span class="compact-punctuation">${ $1 }</span>${ $2 }`;
+            })
             .replace(/\[(.+?)\]/g, ($0, $1) => {
                 const itemNames = $1.split('|');
                 const shortName = itemNames[0];
                 const fullName = itemNames[1] || shortName;
                 return `<temp-item-slot>${ fullName }</temp-item-slot>${ shortName }`;
-            })
-            .replace(/(、)\[/g, ($0, $1) => {
-                return `<span class="comma-before-item-icon">${ $1 }</span>[`;
             })
             + '</div>');
 
@@ -937,6 +937,7 @@ Create.view = (() => {
         Util.addStyleRules(/*css*/`
             .view {
                 display: flex;
+                width: 600px;
                 flex-direction: column;
                 background-color: var(--view-background-color);
                 border: 3px solid var(--view-border-color);
@@ -969,6 +970,11 @@ Create.view = (() => {
                 >section {
                     margin: 5px;
                     flex-grow: 1;
+                }
+            }
+            @media (width < 630px) {
+                .view {
+                    width: calc(100vw - 20px);
                 }
             }
         `);

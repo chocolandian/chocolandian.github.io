@@ -15,7 +15,6 @@ import {
         #character-view {
             top: 10px;
             height: 150px;
-            width: var(--main-view-width);
             background-color: var(--view-background-color);
         }
         @media (height < 480px) or (width < 630px) {
@@ -118,7 +117,6 @@ import {
     Util.addStyleRules(/*css*/`
         #message-view {
             top: 180px;
-            width: var(--main-view-width);
             height: calc(100% - 200px);
 
             >section {
