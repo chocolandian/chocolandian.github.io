@@ -73,7 +73,7 @@ import {
     });
 
     const characterGears = $('#character-gears');
-    characterView.outfit = Create.outfit('');
+    characterView.outfit = Create.outfit();
     characterGears.append(characterView.outfit);
 
     Object.assign(characterGears, {
@@ -516,29 +516,29 @@ if (location.hash.startsWith('#404')) {
         '/images/background/hapinesuwanpi-sitting.webp': {
             left: 345,
             top: -150,
-            sitting: true,
+            isSitting: true,
         },
         '/images/character/yuruusapa-ka-momo.webp': {
             left: -360,
             top: 50,
-            reverse: true,
+            isReverse: true,
         },
         '/images/background/tsukiyononaitoweashiro-fainting.webp': {
             left: -450,
             top: -100,
-            reverse: true,
-            sitting: true,
+            isReverse: true,
+            isSitting: true,
         },
         '/images/background/wabijinnadeshiko-preparing.webp': {
             left: 410,
             top: -10,
-            reverse: true,
-            attacking: true,
+            isReverse: true,
+            isAttacking: true,
         },
         '/images/background/training-barrel.webp': {
             left: 460,
             top: -4,
-            visible: true,
+            isAlwaysVisible: true,
         },
     };
 
@@ -552,10 +552,15 @@ if (location.hash.startsWith('#404')) {
         threshold: 0.6,
     });
 
-    for (const [path, option] of Object.entries(images)) {
-        const outfit = Create.outfit(path, !!option.reverse, !!option.sitting, !!option.attacking);
+    for (const [imageSrc, option] of Object.entries(images)) {
+        const outfit = Create.outfit({
+            imageSrc,
+            isReverse: option.isReverse,
+            isSitting: option.isSitting,
+            isAttacking: option.isAttacking,
+        });
 
-        if (!option.visible) {
+        if (!option.isAlwaysVisible) {
             observer.observe(outfit);
         }
         outfit.style.inset = `

@@ -9,6 +9,9 @@ const Util = {
     elementize(html) {
         const template = document.createElement('template');
         template.innerHTML = html;
+        $$(`[class*="  "]`, template.content).forEach(element => {
+            element.className = [...element.classList.values()].join(' ');
+        });
         return template.content.firstElementChild;
     },
 
@@ -401,8 +404,15 @@ Create.itemSlot = ({
     `);
 
     const rootElement = Util.elementize(/*html*/`
-        <span class="item-slot${ isFramed ? ' framed' : '' }${ isShadowed ? ' shadowed' : '' }">
-            <canvas class="item-icon${ isFukidashi ? ' fukidashi' : '' }"></canvas>
+        <span class="
+            item-slot
+            ${ isFramed ? 'framed' : '' }
+            ${ isShadowed ? 'shadowed' : '' }
+        ">
+            <canvas class="
+                item-icon
+                ${ isFukidashi ? 'fukidashi' : '' }
+            "></canvas>
         </span>
     `);
     const dragThumb = $('.item-icon', rootElement);
@@ -465,7 +475,13 @@ Create.itemSlot = ({
 
 
 
-Create.outfit = (image, isReverse = false, isSitting = false, isAttacking = false, alt = '') => {
+Create.outfit = ({
+    imageSrc = null,
+    isReverse = false,
+    isSitting = false,
+    isAttacking = false,
+    alt = '',
+} = {}) => {
     Util.addStyleRules(/*css*/`
         .outfit {
             --outfit-basic-width: 130px;
@@ -527,12 +543,12 @@ Create.outfit = (image, isReverse = false, isSitting = false, isAttacking = fals
 
 
     const rootElement = Util.elementize(/*html*/`
-        <figure class="outfit${
-            isReverse ? ' reverse': ''}${
-            isSitting ? ' sitting' : ''}${
-            isAttacking ? ' attacking' : ''
-        }">
-            <img src="${ image }" alt="${ alt }">
+        <figure class="outfit
+            ${ isReverse ? 'reverse': '' }
+            ${ isSitting ? 'sitting' : '' }
+            ${ isAttacking ? 'attacking' : '' }
+        ">
+            <img src="${ imageSrc ?? '' }" alt="${ alt }">
         </figure>
     `);
 
@@ -734,13 +750,13 @@ Create.scrollableSection = (isThumbPositionDiscrete = false) => {
         const articleElement = Util.elementize('<div>' + text
             .split('\n')
             .map(line => {
-                if (line) {
-                    if (line.trim().startsWith('!')) {
-                        return line.slice(1);
-                    }
-                    return `<p>${ line }</p>`;
+                if (!line) {
+                    return '<hr>';
                 }
-                return '<hr>';
+                if (line.trim().startsWith('!')) {
+                    return line.slice(1);
+                }
+                return `<p>${ line }</p>`;
             })
             .join('')
             .replace(emojiRegex, '<span class="emoji">$&</span>')
@@ -920,7 +936,7 @@ Create.characterSlot = ({
         </div>
     `);
 
-    const outfit = Create.outfit(`/images/character/${ thumbnail }.webp`);
+    const outfit = Create.outfit({ imageSrc: `/images/character/${ thumbnail }.webp` });
     rootElement.prepend(outfit);
 
     $('.item-slots', rootElement).append(...itemSlots);
