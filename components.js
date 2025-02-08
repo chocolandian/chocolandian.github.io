@@ -1,5 +1,6 @@
 const $ = (selectors, ancestor = document) => ancestor.querySelector(selectors);
 const $$ = (selectors, ancestor = document) => [...ancestor.querySelectorAll(selectors)];
+const px = (value) => `${ value }px`;
 
 const Util = {
     clampNum(min, num, max) {
@@ -26,9 +27,22 @@ const Util = {
         };
     })(),
 
-    moveElementToCursor(pointerEvent, element = pointerEvent.target) {
-        element.style.left = `${ element.offsetLeft + pointerEvent.movementX }px`;
-        element.style.top = `${ element.offsetTop + pointerEvent.movementY }px`;
+    grabStart({
+        event,
+        target = event.target,
+        left = event.pageX - target.offsetLeft,
+        top = event.pageY - target.offsetTop,
+    }) {
+        target.grabStartLeft = left;
+        target.grabStartTop = top;
+    },
+
+    grabMove({
+        event,
+        target = event.target,
+    }) {
+        target.style.left = px(event.pageX - target.grabStartLeft);
+        target.style.top = px(event.pageY - target.grabStartTop);
     },
 
     clearChildrenPropsBeforeEmptying(element, isFirstCall = true) {
@@ -67,8 +81,8 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
     image.src = src;
     await image.decode();
 
-    this.style.width = `${ image.width }px`;
-    this.style.height = `${ image.height }px`;
+    this.style.width = px(image.width);
+    this.style.height = px(image.height);
 
     const zoomScale = 4;
     this.width = image.width * zoomScale;
@@ -344,6 +358,8 @@ const Trigger = {
 
 
 
+
+
 const popup = Util.elementize(/*html*/`
     <canvas id="popup" hidden></canvas>
 `);
@@ -361,8 +377,11 @@ const popup = Util.elementize(/*html*/`
     `);
 
     Object.assign(popup, {
+        onDragStart(event) {
+            Util.grabStart({ event });
+        },
         onDragMove(event) {
-            Util.moveElementToCursor(event);
+            Util.grabMove({ event });
         },
 
         onDragEnd(event, isDragMoved) {
@@ -381,8 +400,8 @@ const popup = Util.elementize(/*html*/`
             const maxLeft = $('main').clientWidth - popup.offsetWidth;
             const maxTop = $('main').clientHeight - popup.offsetHeight;
 
-            popup.style.left = `${ Util.clampNum(0, pageX - $('main').offsetLeft, maxLeft) }px`;
-            popup.style.top = `${ Util.clampNum(0, pageY - $('main').offsetTop, maxTop) }px`;
+            popup.style.left = px(Util.clampNum(0, pageX - $('main').offsetLeft, maxLeft));
+            popup.style.top = px(Util.clampNum(0, pageY - $('main').offsetTop, maxTop));
             popup.hidden = false;
         },
 
@@ -515,20 +534,26 @@ Create.itemSlot = ({
     };
 
     Object.assign(dragThumb, {
+        onDragStart(event) {
+            if (!isDraggable) {
+                return;
+            }
+            const rect = dragThumb.offsetParent.getBoundingClientRect();
+            Util.grabStart({
+                event,
+                left: rect.x + 17,
+                top: rect.y + 17,
+            });
+            dragThumb.style.zIndex = 9999999;
+        },
         onDragMove(event, isDragMoved) {
             if (!isDraggable) {
                 return;
             }
             if (!isDragMoved) {
                 popup.hidden = true;
-                const rect = dragThumb.getBoundingClientRect();
-                Object.assign(dragThumb.style, {
-                    left: `${ dragThumb.offsetLeft + event.pageX - rect.left - 17 }px`,
-                    top: `${ dragThumb.offsetTop + event.pageY - rect.top - 17 }px`,
-                    zIndex: 9999999,
-                });
             }
-            Util.moveElementToCursor(event);
+            Util.grabMove({ event });
         },
 
         onDragCancel: resetPos,
@@ -682,6 +707,9 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
             .compact-punctuation {
                 margin-right: -6px;
             }
+            hr[hidden] {
+                display: none;
+            }
         }
 
         .scrollbar {
@@ -777,9 +805,10 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
 
         for (const element of staticElementList) {
             page.append(element);
+            element.hidden = false;
             if (page.scrollHeight > pageMaxHeight) {
                 if (element.localName === 'hr') {
-                    element.remove();
+                    element.hidden = true;
                     continue;
                 }
                 page = createPage(element);
@@ -821,7 +850,7 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
             const newThumbTop = (thumbTop === null || isThumbPosDiscrete)
                 ? currentPageIndex / indexRatio
                 : thumbTop;
-            scrollbarThumb.style.top = `${ Util.clampNum(0, newThumbTop, maxThumbTop) }px`;
+            scrollbarThumb.style.top = px(Util.clampNum(0, newThumbTop, maxThumbTop));
         };
     })();
 
@@ -887,8 +916,11 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
     });
 
     Object.assign(scrollbarThumb, {
+        onDragStart(event) {
+            Util.grabStart({ event });
+        },
         onDragMove(event) {
-            updateThumbPosAndPage({ thumbTop: scrollbarThumb.offsetTop + event.movementY });
+            updateThumbPosAndPage({ thumbTop: event.pageY - scrollbarThumb.grabStartTop });
         },
     });
 
@@ -1070,8 +1102,17 @@ Create.view = (() => {
 
 
         Object.assign($('h2', rootElement), {
+            onDragStart(event) {
+                Util.grabStart({
+                    event,
+                    target: rootElement,
+                });
+            },
             onDragMove(event) {
-                Util.moveElementToCursor(event, rootElement);
+                Util.grabMove({
+                    event,
+                    target: rootElement,
+                });
                 rootElement.style.margin = 0;
             },
         });
