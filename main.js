@@ -70,6 +70,11 @@ import {
             hand: null,
             boots: null,
         },
+        onItemDrop(item) {
+            if (item.dataset.href) {
+                location.hash = item.dataset.href;
+            }
+        },
     });
 
     const characterGears = $('#character-gears');
@@ -78,16 +83,14 @@ import {
 
     Object.assign(characterGears, {
         onMainJsonLoaded(json) {
-            const fragment = new DocumentFragment();
             for (const gearType of Object.keys(characterView.gears)) {
                 const icon = Create.itemSlot({
                     gearSlotImageSrc: json.globalImages[gearType],
                 });
                 icon.id = gearType;
-                fragment.append(icon);
+                characterGears.append(icon);
                 characterView.gears[gearType] = icon;
             }
-            characterGears.append(fragment);
         },
 
         onOutfitJsonLoaded(json, name) {
@@ -100,11 +103,7 @@ import {
                 );
             }
             characterView.outfit.replace(`/images/character/${ name }.webp`);
-            characterView.open();
-        },
-
-        onItemDrop(item) {
-            location.hash = item.dataset.href ?? location.hash;
+            characterView.hidden = false;
         },
     });
 }
@@ -121,6 +120,7 @@ import {
 
             >section {
                 margin: 10px;
+                touch-action: pinch-zoom;
             }
         }
         @media (height < 480px) or (width < 630px) {
@@ -143,7 +143,7 @@ import {
             user-select: none;
             position: relative;
 
-            li:not(:last-child) {
+            li:not(#message-info-tab) {
                 padding: 2px 10px 0;
                 border-radius: var(--view-radius) var(--view-radius) 0 0;
                 margin-right: 10px;
@@ -151,11 +151,11 @@ import {
                 color: var(--view-background-color);
                 font-weight: bold;
 
-                &.selected {
+                &[aria-selected="true"] {
                     background-color: var(--view-border-color);
                 }
             }
-            #info-mark {
+            #message-info-tab {
                 position: absolute;
                 right: 10px;
                 bottom: 0;
@@ -163,7 +163,7 @@ import {
                 height: 30px;
                 background-image: url("data:image/svg+xml;charset=utf-8,<svg viewBox='-50 -50 100 100' xmlns='http://www.w3.org/2000/svg'><circle fill='white' r='50' cx='0' cy='0'></circle><circle fill='rgb(232,113,53)' r='44' cx='0' cy='0'></circle><circle fill='white' r='35' cx='0' cy='0'></circle><rect fill='rgb(32,43,96)' x='-11' y='-30' width='22' height='58'></rect><rect fill='white' x='-12' y='-18' width='24' height='6'></rect></svg>");
 
-                &.selected {
+                &[aria-selected="true"] {
                     animation: floating .5s infinite linear;
                 }
             }
@@ -180,7 +180,7 @@ import {
         #message-tab-panels {
             position: relative;
 
-            .scrollable-section:not(.selected) {
+            .scrollable-section[hidden] {
                 visibility: hidden;
                 position: absolute;
             }
@@ -207,32 +207,54 @@ import {
 
     messageView.innerSpace.classList.add('fixed-header-container');
     messageView.innerSpace.innerHTML = /*html*/`
-        <ul id="message-tab-bar">
-            <li>コーデ</li>
-            <li>キャラ</li>
-            <li id="info-mark"></li>
-        </ul>
-        <div id="message-tab-panels">
-        </div>
+        <ul id="message-tab-bar" role="tablist"></ul>
+        <div id="message-tab-panels"></div>
     `;
 
-    Object.assign(messageView, {
-        tabPanels: {
-            outfit: null,
-            character: null,
-            info: null,
-        }
-    });
+    const tabSets = {
+        outfit: {
+            tabText: 'コーデ',
+            tab: null,
+            tabPanel: null,
+        },
+        character: {
+            tabText: 'キャラ',
+            tab: null,
+            tabPanel: null,
+        },
+        info: {
+            tabText: '',
+            tab: null,
+            tabPanel: null,
+        },
+    };
+    Object.assign(messageView, tabSets);
 
-    const tabPanels = Object.keys(messageView.tabPanels).map((tabName) => {
+    for (const tabName of Object.keys(tabSets)) {
+        const tab = document.createElement('li');
+        Object.assign(tab, {
+            id: `message-${ tabName }-tab`,
+            textContent: messageView[tabName].tabText,
+            role: 'tab',
+            ariaSelected: false,
+        });
+
         const tabPanel = Create.scrollableSection();
-        tabPanel.id = `message-${ tabName }-tab-panel`;
-        messageView.tabPanels[tabName] = tabPanel;
-        return tabPanel;
-    });
-    $('#message-tab-panels').append(...tabPanels);
+        Object.assign(tabPanel, {
+            id: `message-${ tabName }-tab-panel`,
+            role: 'tabpanel',
+            hidden: true,
+        });
 
-    Object.assign(messageView.tabPanels.outfit, {
+        tab.setAttribute('aria-controls', tabPanel.id);
+        tabPanel.setAttribute('aria-labelledby', tab.id);
+
+        $('#message-tab-bar').append(tab);
+        $('#message-tab-panels').append(tabPanel);
+        Object.assign(messageView[tabName], { tab, tabPanel });
+    }
+
+    Object.assign(messageView.outfit.tabPanel, {
         onMainJsonLoaded(json) {
             const fragment = new DocumentFragment();
             for (const character of json.characters) {
@@ -249,58 +271,70 @@ import {
                 });
                 fragment.append(Create.characterSlot(details));
             }
-            messageView.tabPanels.character.replaceChildren(...fragment.children);
+            messageView.character.tabPanel.replaceChildren(...fragment.children);
         },
         onOutfitJsonLoaded(json) {
-            messageView.tabPanels.outfit.overwrite(json.articles.message, json);
+            messageView.outfit.tabPanel.overwrite(json.articles.message, json);
         },
     });
 
 
-    const switchTabPanel = ({ clickedTab = null, index = null } = {}) => {
-        const tabs = $$('#message-tab-bar li');
-        const tabPanels = Object.values(messageView.tabPanels);
-        [...tabs, ...tabPanels].forEach(element => element.classList.remove('selected'));
+    const switchTabPanel = (clickedTab) => {
+        const selectedTab = $('[aria-selected="true"]', messageView);
+        selectedTab?.setAttribute('aria-selected', 'false');
 
-        index ??= (clickedTab === null)
-            ? +localStorage.messageViewTabIndex
-            : tabs.findIndex(tab => tab === clickedTab);
-        index = tabs[index] ? index : tabs.length - 1;
+        const activeTabPanel = $('[role="tabpanel"]:not([hidden])', messageView);
+        activeTabPanel?.setAttribute('hidden', '');
 
-        tabs[index].classList.add('selected');
-        tabPanels[index].classList.add('selected');
-        localStorage.messageViewTabIndex = index;
+        clickedTab ??= $(localStorage.messageTabId) ?? messageView.info.tab;
+        clickedTab.setAttribute('aria-selected', 'true');
+        localStorage.messageTabId = '#' + clickedTab.id;
+
+        const tabPanelId = '#' + clickedTab.getAttribute('aria-controls');
+        $(tabPanelId).removeAttribute('hidden');
     };
 
     for (const tab of $$('#message-tab-bar li')) {
         Object.assign(tab, {
             onDragStart() {
-                switchTabPanel({ clickedTab: tab });
+                switchTabPanel(tab);
             },
         });
     }
 
-    Object.assign(messageView.tabPanels.character, {
+    Object.assign(messageView.character.tabPanel, {
         onMainJsonLoaded(json) {
-            messageView.tabPanels.info.overwrite(json.articles['message-info'], json);
+            messageView.info.tabPanel.overwrite(json.articles['message-info'], json);
             switchTabPanel();
         },
+
         onOutfitJsonLoaded(json, name) {
-            $('.equipped', messageView.tabPanels.character)?.classList.remove('equipped');
-            $(`[data-href="${ name }"]`, messageView.tabPanels.character).classList.add('equipped');
-            messageView.open();
+            $('.equipped', messageView.character.tabPanel)?.classList.remove('equipped');
+            $(`[data-href="${ name }"]`, messageView.character.tabPanel).classList.add('equipped');
+            messageView.hidden = false;
         },
+
         shouldCaptureBubblingDragEvent: true,
 
-        onDragEnd(event, hasDragMoved) {
-            if (hasDragMoved) {
+        onDragEnd(event, isDragMoved) {
+            if (isDragMoved) {
                 return;
             }
             if (event.target.matches('.equipped')) {
-                switchTabPanel({ index: 0 });
+                switchTabPanel(messageView.outfit.tab);
             } else if (event.target.matches('[data-href]')) {
                 location.hash = event.target.dataset.href;
             }
+        },
+    });
+
+    Object.assign($('#message-tab-panels'), {
+        onSwipeX(swipeDelta) {
+            const selectedTab = $('#message-tab-bar [aria-selected="true"]');
+            const newTab = swipeDelta > 0
+                ? (selectedTab.previousElementSibling ?? selectedTab.parentNode.lastChild)
+                : (selectedTab.nextElementSibling ?? selectedTab.parentNode.firstChild);
+            switchTabPanel(newTab);
         },
     });
 }
@@ -382,7 +416,7 @@ import {
                 }
             }
         }
-        body:has(#overlay-404:not(.closed)) main {
+        body:has(#overlay-404:not([hidden])) main {
             filter: brightness(0.5);
             pointer-events: none;
             user-select: none;
@@ -402,28 +436,28 @@ import {
     `;
 
     let countdownTimer;
-    const hide = () => {
+    const close = () => {
         clearInterval(countdownTimer);
         countdownTimer = null;
-        overlay404.close();
+        overlay404.hidden = true;
     };
 
-    const show = () => {
+    const open = () => {
         if (countdownTimer) {
-            hide();
-            show();
+            close();
+            open();
             return;
         }
         const timeDisplay = $('time', overlay404);
         let countdown = 9;
 
-        overlay404.open();
+        overlay404.hidden = false;
         timeDisplay.textContent = '00:0' + countdown;
 
         countdownTimer = setInterval(() => {
             countdown--;
             if (countdown < 1) {
-                hide();
+                close();
                 return;
             }
             timeDisplay.textContent = '00:0' + countdown;
@@ -431,11 +465,11 @@ import {
     };
 
     Object.assign($('button', overlay404), {
-        onDragEnd: hide,
+        onDragEnd: close,
     });
 
     Object.assign(overlay404, {
-        onNotFound: show,
+        onNotFound: open,
     });
     $('body').append(overlay404);
 }

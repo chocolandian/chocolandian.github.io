@@ -104,6 +104,9 @@
     canvas:not([data-hashed-src]) {
         visibility: hidden;
     }
+    [hidden] {
+        display: revert;
+    }
 
     .fixed-header-container {
         display: flex;
@@ -170,6 +173,9 @@
             picture img {
                 inset: -999%;
             }
+        }
+        &:has(>#background~*:hover)>#background {
+            pointer-events: none;
         }
     }
     </style>

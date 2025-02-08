@@ -9,7 +9,7 @@ const Util = {
     elementize(html) {
         const template = document.createElement('template');
         template.innerHTML = html;
-        $$(`[class*="  "]`, template.content).forEach(element => {
+        $$('[class*="  "]', template.content).forEach(element => {
             element.className = [...element.classList.values()].join(' ');
         });
         return template.content.firstElementChild;
@@ -31,22 +31,180 @@ const Util = {
         element.style.top = `${ element.offsetTop + pointerEvent.movementY }px`;
     },
 
-    clearReferencesBeforeRemoval(element, isFirstCall = true) {
+    clearChildrenPropsBeforeEmptying(element, isFirstCall = true) {
         if (!isFirstCall) {
-            for (const propertyName of Object.keys(element)) {
-                delete element[propertyName];
+            for (const propName of Object.keys(element)) {
+                delete element[propName];
             }
         }
         for (const child of element.children) {
-            Util.clearReferencesBeforeRemoval(child, false);
+            Util.clearChildrenPropsBeforeEmptying(child, false);
         }
+    },
+
+    isAnyNodeSelected() {
+        return getSelection().rangeCount > 0 && !getSelection().getRangeAt(0).collapsed;
+    },
+
+    async hashize(message) {
+        return [...new Uint8Array(await crypto.subtle.digest('SHA-1',new TextEncoder().encode(message)))].map(b=>b.toString(16).padStart(2,'0')).join('');
     },
 };
 
 
+HTMLCanvasElement.prototype.drawAsync = async function(src) {
+    const context = this.getContext('2d');
+    if (!src) {
+        context.clearRect(0, 0, this.width, this.height);
+        delete this.dataset.hashedSrc;
+        return;
+    }
+    const hashedSrc = await Util.hashize(src);
+    if (this.dataset.hashedSrc === hashedSrc) {
+        return;
+    }
+    const image = new Image();
+    image.src = src;
+    await image.decode();
+
+    this.style.width = `${ image.width }px`;
+    this.style.height = `${ image.height }px`;
+
+    const zoomScale = 4;
+    this.width = image.width * zoomScale;
+    this.height = image.height * zoomScale;
+
+    context.imageSmoothingEnabled = false;
+    context.drawImage(image, 0, 0, this.width, this.height);
+    this.dataset.hashedSrc = hashedSrc;
+};
 
 {
-    for (const customPropertyName of [
+    const originalStopPropagation = Event.prototype.stopPropagation;
+    Event.prototype.stopPropagation = function() {
+        this.propagationStopped = true;
+        originalStopPropagation.call(this);
+    };
+}
+
+
+
+{
+    const preventEvent = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+    };
+
+    const propagateDragEvent = (eventName, event, ...args) => {
+        let ancestor = event.target;
+        while (ancestor?.parentNode?.closest && !event.propagationStopped) {
+            ancestor[eventName]?.(event, ...args);
+            ancestor = ancestor.parentNode.closest('.shouldCaptureBubblingDragEvent');
+        }
+    };
+
+    const isPrimaryPointer = (event) => {
+        return (event.pointerType === 'mouse' && (event.button === 0 || event.buttons === 1))
+            || (event.pointerType === 'touch' && event.isPrimary);
+    };
+
+    let isDragMoved = false;
+    let isDragCancelled = false;
+    let primaryPointerEvent = null;
+    const activePointerIds = new Set();
+
+
+    const pointerDown = (event) => {
+        activePointerIds.add(event.pointerId);
+
+        if (isDragCancelled || !isPrimaryPointer(event)) {
+            cancelDrag();
+            return;
+        }
+        if (event.target.onDragMove) {
+            event.target.setPointerCapture(event.pointerId);
+        }
+        primaryPointerEvent = event;
+        isDragMoved = false;
+
+        getSelection().removeAllRanges();
+        $('body').classList.add('pointer-pressing');
+        propagateDragEvent('onDragStart', event);
+    };
+
+
+    const pointerMove = (event) => {
+        if (isDragCancelled || primaryPointerEvent?.target !== event.target) {
+            return;
+        }
+        if (!isPrimaryPointer(event)) {
+            cancelDrag();
+            return;
+        }
+        const minDragMoveDelta = 3;
+        if (
+            !isDragMoved
+            && Math.abs(primaryPointerEvent.pageX - event.pageX) < minDragMoveDelta
+            && Math.abs(primaryPointerEvent.pageY - event.pageY) < minDragMoveDelta
+        ) {
+            return;
+        }
+
+        event.target.onDragMove?.(event, isDragMoved);
+        isDragMoved = true;
+    };
+
+
+    const canDragEnd = (event) => {
+        $('body').classList.remove('pointer-pressing');
+
+        if (event.pointerType === 'touch') {
+            for (const eventName of ['mousedown', 'mouseup']) {
+                document.addEventListener(eventName, preventEvent, { once: true });
+            }
+        }
+        if (Util.isAnyNodeSelected() || primaryPointerEvent.target !== event.target) {
+            return false;
+        }
+        return true;
+    };
+
+
+    const pointerUp = (event) => {
+        if (
+            !activePointerIds.delete(event.pointerId)
+            || isDragCancelled
+            || !canDragEnd(event)
+        ) {
+            isDragCancelled = activePointerIds.size > 0;
+            return;
+        }
+        propagateDragEvent('onDragEnd', event, isDragMoved);
+        primaryPointerEvent = null;
+    };
+
+
+    const cancelDrag = () => {
+        if (primaryPointerEvent && canDragEnd(primaryPointerEvent)) {
+            propagateDragEvent('onDragCancel', primaryPointerEvent);
+        }
+        primaryPointerEvent = null;
+        isDragCancelled = true;
+    };
+
+
+    document.addEventListener('pointerdown', pointerDown, { passive: true });
+    document.addEventListener('pointermove', pointerMove, { passive: true });
+    document.addEventListener('pointerup', pointerUp, { passive: true });
+    document.addEventListener('pointercancel', pointerUp, { passive: true });
+    document.addEventListener('dragstart', preventEvent);
+}
+
+
+{
+    for (const customPropName of [
+        'onSwipeX',
+        'onSwipeY',
         'onWheelEnd',
         'onResizeEnd',
         'onWindowResizeEnd',
@@ -56,22 +214,63 @@ const Util = {
         'onNotFound',
         'shouldCaptureBubblingDragEvent',
     ]) {
-        Object.defineProperty(HTMLElement.prototype, customPropertyName, {
+        Object.defineProperty(HTMLElement.prototype, customPropName, {
             get() {
-                return this[`__${ customPropertyName }`];
+                return this[`__${ customPropName }`];
             },
             set(value) {
-                if (!Object.prototype.hasOwnProperty.call(this, `__${ customPropertyName }`)) {
-                    this.classList.add(customPropertyName);
+                if (!Object.hasOwn(this, `__${ customPropName }`)) {
+                    this.classList.add(customPropName);
 
-                    if (customPropertyName === 'onResizeEnd') {
+                    switch (customPropName) {
+                    case 'onSwipeX':
+                    case 'onSwipeY':
+                        enableSwipe(this);
+                        break;
+                    case 'onResizeEnd':
                         resizeObserver.observe(this);
+                        break;
                     }
                 }
-                this[`__${ customPropertyName }`] = value;
+                this[`__${ customPropName }`] = value;
             },
         });
     }
+
+    const enableSwipe = (swipeableElement) => {
+        if (Object.hasOwn(swipeableElement, 'onDragStart')) {
+            return;
+        }
+        let dragStartEvent = null;
+
+        Object.assign(swipeableElement, {
+            shouldCaptureBubblingDragEvent: true,
+
+            onDragStart(event) {
+                dragStartEvent = event.pointerType === 'touch' ? event : null;
+            },
+            onDragEnd(event) {
+                if (dragStartEvent === null) {
+                    return;
+                }
+                const swipeDeltaX = event.pageX - dragStartEvent.pageX;
+                const swipeDeltaY = event.pageY - dragStartEvent.pageY;
+                dragStartEvent = null;
+
+                if (Math.abs(swipeDeltaX) > Math.abs(swipeDeltaY)) {
+                    const minSwipeDeltaX = 40;
+                    if (Math.abs(swipeDeltaX) > minSwipeDeltaX) {
+                        swipeableElement.onSwipeX?.(swipeDeltaX);
+                    }
+                    return;
+                }
+                const minSwipeDeltaY = 40;
+                if (Math.abs(swipeDeltaY) > minSwipeDeltaY) {
+                    swipeableElement.onSwipeY?.(swipeDeltaY);
+                }
+            },
+        });
+    };
 
 
     const waitForEnd = (callback, delayMs = 100) => {
@@ -119,7 +318,7 @@ const Util = {
 
 const Trigger = {
     onItemDrop(pointerEvent) {
-        const {pageX, pageY} = pointerEvent;
+        const { pageX, pageY } = pointerEvent;
         const dropTarget = document.elementFromPoint(pageX, pageY);
         dropTarget.closest('.onItemDrop')?.onItemDrop(pointerEvent.target, dropTarget);
     },
@@ -144,127 +343,9 @@ const Trigger = {
 };
 
 
-{
-    const isPrimaryPointer = (event) => {
-        return (event.pointerType === 'mouse' && (event.button === 0 || event.buttons === 1))
-            || (event.pointerType === 'touch' && event.isPrimary);
-    };
-
-    const preventEvent = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-    };
-
-    const propagateDragEvent = (eventType, event, ...args) => {
-        let ancestor = event.target;
-        while (event.defaultPrevented || ancestor?.parentNode) {
-            ancestor[eventType]?.(event, ...args);
-            ancestor = ancestor.parentNode.closest('.shouldCaptureBubblingDragEvent');
-        }
-    };
-
-    let draggingElement = null;
-    let primaryPointerId = null;
-    let hasDragMoved = false;
-
-    const pointerDown = (event) => {
-        if (!isPrimaryPointer(event) || draggingElement) {
-            return;
-        }
-        getSelection().removeAllRanges();
-        $('body').classList.add('pointer-pressing');
-        hasDragMoved = false;
-
-        draggingElement = event.target;
-        if (draggingElement.onDragMove) {
-            draggingElement.setPointerCapture(event.pointerId);
-            primaryPointerId = event.pointerId;
-        }
-        propagateDragEvent('onDragStart', event);
-    };
-
-    const pointerMove = (event) => {
-        if (draggingElement !== event.target) {
-            return;
-        }
-        if (!isPrimaryPointer(event)) {
-            if (primaryPointerId) {
-                draggingElement.releasePointerCapture(primaryPointerId);
-            }
-            return;
-        }
-        // propagateDragEvent('onDragMove', event, hasDragMoved);
-        event.target.onDragMove?.(event, hasDragMoved);
-        hasDragMoved = true;
-    };
-
-    const pointerUp = (event) => {
-        if (!isPrimaryPointer(event) || !draggingElement) {
-            return;
-        }
-        draggingElement = null;
-        primaryPointerId = null;
-        $('body').classList.remove('pointer-pressing');
-
-        const isAnyNodeSelected = () => getSelection().rangeCount > 0 && !getSelection().getRangeAt(0).collapsed;
-        if (isAnyNodeSelected()) {
-            return;
-        }
-        if (event.pointerType === 'touch') {
-            for (const eventType of 'mousedown,mouseup'.split(',')) {
-                document.addEventListener(eventType, preventEvent, { once: true });
-            }
-        }
-        propagateDragEvent('onDragEnd', event, hasDragMoved);
-    };
-
-    document.addEventListener('pointerdown', pointerDown, { passive: true });
-    document.addEventListener('pointermove', pointerMove, { passive: true });
-    document.addEventListener('pointerup', pointerUp, { passive: true });
-    document.addEventListener('pointercancel', pointerUp, { passive: true });
-    document.addEventListener('lostpointercapture', pointerUp, { passive: true });
-
-    document.addEventListener('dragstart', preventEvent);
-    document.addEventListener('selectstart', (event) => {
-        if (primaryPointerId !== null) {
-            preventEvent(event);
-        }
-    });
-}
-
-
-HTMLCanvasElement.prototype.drawAsync = async function(src) {
-    const context = this.getContext('2d');
-    if (!src) {
-        context.clearRect(0, 0, this.width, this.height);
-        delete this.dataset.hashedSrc;
-        return;
-    }
-    const hashize = async (message)=>[...new Uint8Array(await crypto.subtle.digest('SHA-1',new TextEncoder().encode(message)))].map(b=>b.toString(16).padStart(2,'0')).join('');
-    const hashedSrc = await hashize(src);
-    if (this.dataset.hashedSrc === hashedSrc) {
-        return;
-    }
-    const image = new Image();
-    image.src = src;
-    await image.decode();
-
-    this.style.width = `${ image.width }px`;
-    this.style.height = `${ image.height }px`;
-
-    const zoomScale = 4;
-    this.width = image.width * zoomScale;
-    this.height = image.height * zoomScale;
-
-    context.imageSmoothingEnabled = false;
-    context.drawImage(image, 0, 0, this.width, this.height);
-    this.dataset.hashedSrc = hashedSrc;
-};
-
-
 
 const popup = Util.elementize(/*html*/`
-    <canvas id="popup" class="closed"></canvas>
+    <canvas id="popup" hidden></canvas>
 `);
 {
     Util.addStyleRules(/*css*/`
@@ -273,7 +354,7 @@ const popup = Util.elementize(/*html*/`
             position: absolute;
             touch-action: pinch-zoom;
 
-            &.closed {
+            &[hidden] {
                 visibility: hidden;
             }
         }
@@ -284,12 +365,14 @@ const popup = Util.elementize(/*html*/`
             Util.moveElementToCursor(event);
         },
 
-        onDragEnd(event, hasDragMoved) {
-            if (hasDragMoved) {
+        onDragEnd(event, isDragMoved) {
+            if (isDragMoved) {
                 return;
             }
             if (event.offsetY <= 12 && popup.offsetWidth - event.offsetX <= 16) {
-                setTimeout(() => popup.hide(), 50);
+                setTimeout(() => {
+                    popup.hidden = true;
+                }, 50);
             }
         },
 
@@ -300,19 +383,11 @@ const popup = Util.elementize(/*html*/`
 
             popup.style.left = `${ Util.clampNum(0, pageX - $('main').offsetLeft, maxLeft) }px`;
             popup.style.top = `${ Util.clampNum(0, pageY - $('main').offsetTop, maxTop) }px`;
-            popup.show();
-        },
-
-        show() {
-            popup.classList.remove('closed');
-        },
-
-        hide() {
-            popup.classList.add('closed');
+            popup.hidden = false;
         },
 
         onWindowResizeEnd() {
-            popup.hide();
+            popup.hidden = true;
         },
     });
     $('main').append(popup);
@@ -431,13 +506,21 @@ Create.itemSlot = ({
     };
     redraw(itemImageSrc, popupImageSrc);
 
+    const resetPos = () => {
+        Object.assign(dragThumb.style, {
+            left: '',
+            top: '',
+            zIndex: '',
+        });
+    };
+
     Object.assign(dragThumb, {
-        onDragMove(event, hasDragMoved) {
+        onDragMove(event, isDragMoved) {
             if (!isDraggable) {
                 return;
             }
-            if (!hasDragMoved) {
-                popup.hide();
+            if (!isDragMoved) {
+                popup.hidden = true;
                 const rect = dragThumb.getBoundingClientRect();
                 Object.assign(dragThumb.style, {
                     left: `${ dragThumb.offsetLeft + event.pageX - rect.left - 17 }px`,
@@ -448,17 +531,16 @@ Create.itemSlot = ({
             Util.moveElementToCursor(event);
         },
 
-        onDragEnd(event, hasDragMoved) {
-            Object.assign(dragThumb.style, {
-                left: '',
-                top: '',
-                zIndex: '',
-            });
-            if (hasDragMoved && isDraggable) {
+        onDragCancel: resetPos,
+
+        onDragEnd(event, isDragMoved) {
+            resetPos();
+            if (isDragMoved && isDraggable) {
+                event.stopPropagation();
                 Trigger.onItemDrop(event);
                 return;
             }
-            if (!hasDragMoved && dragThumb.__popupImageSrc) {
+            if (!isDragMoved && dragThumb.__popupImageSrc) {
                 popup.drawAsync(dragThumb.__popupImageSrc).then(() => {
                     popup.moveToCursor(event);
                 });
@@ -563,7 +645,7 @@ Create.outfit = ({
 
 
 
-Create.scrollableSection = (isThumbPositionDiscrete = false) => {
+Create.scrollableSection = (isThumbPosDiscrete = false) => {
     Util.addStyleRules(/*css*/`
         .scrollable-section {
             position: relative;
@@ -686,7 +768,7 @@ Create.scrollableSection = (isThumbPositionDiscrete = false) => {
 
         const pageMaxHeight = scrollable.clientHeight;
         scrollable.classList.remove('completed');
-        Util.clearReferencesBeforeRemoval(scrollable);
+        Util.clearChildrenPropsBeforeEmptying(scrollable);
         scrollable.innerHTML = '';
 
         let page = createPage(staticElementList.shift());
@@ -708,11 +790,11 @@ Create.scrollableSection = (isThumbPositionDiscrete = false) => {
         pages = [...scrollable.children];
         scrollbar.classList[pages.length < 2 ? 'add' : 'remove']('disabled');
 
-        updateThumbPositionAndPage();
+        updateThumbPosAndPage();
     };
 
 
-    const updateThumbPositionAndPage = (() => {
+    const updateThumbPosAndPage = (() => {
         let currentPageIndex;
         return ({ pageDelta = 0, thumbTop = null } = {}) => {
             const indexRatio = (pages.length - 1) / maxThumbTop;
@@ -736,7 +818,7 @@ Create.scrollableSection = (isThumbPositionDiscrete = false) => {
                 currentPageIndex = newIndex;
             }
 
-            const newThumbTop = (thumbTop === null || isThumbPositionDiscrete)
+            const newThumbTop = (thumbTop === null || isThumbPosDiscrete)
                 ? currentPageIndex / indexRatio
                 : thumbTop;
             scrollbarThumb.style.top = `${ Util.clampNum(0, newThumbTop, maxThumbTop) }px`;
@@ -786,52 +868,33 @@ Create.scrollableSection = (isThumbPositionDiscrete = false) => {
         replaceChildren(...articleElement.children);
     };
 
-    {
-        let swipeStartY = null;
-        Object.assign(scrollable, {
-            onResizeEnd,
-            shouldCaptureBubblingDragEvent: true,
-
-            onDragStart(event) {
-                swipeStartY = (event.pointerType === 'touch' && !event.target.matches('.item-icon'))
-                    ? event.pageY
-                    : null;
-            },
-            onDragEnd(event) {
-                if (swipeStartY === null) {
-                    return;
-                }
-                const swipeDeltaY = swipeStartY - event.pageY;
-                swipeStartY = null;
-
-                const minSwipeDeltaY = 40;
-                if (Math.abs(swipeDeltaY) > minSwipeDeltaY) {
-                    updateThumbPositionAndPage({ pageDelta: Math.sign(swipeDeltaY) });
-                }
-            },
-        });
-    }
+    Object.assign(scrollable, {
+        onResizeEnd,
+        onSwipeY(swipeDelta) {
+            updateThumbPosAndPage({ pageDelta: Math.sign(-swipeDelta) });
+        },
+    });
 
     Object.assign(scrollbar, {
         onDragEnd(event) {
             const clickedBarTop = event.offsetY;
             if (0 <= clickedBarTop && clickedBarTop <= maxThumbTop) {
-                updateThumbPositionAndPage({ thumbTop: clickedBarTop });
+                updateThumbPosAndPage({ thumbTop: clickedBarTop });
             } else {
-                updateThumbPositionAndPage({ pageDelta: Math.sign(clickedBarTop) });
+                updateThumbPosAndPage({ pageDelta: Math.sign(clickedBarTop) });
             }
         },
     });
 
     Object.assign(scrollbarThumb, {
         onDragMove(event) {
-            updateThumbPositionAndPage({ thumbTop: scrollbarThumb.offsetTop + event.movementY });
+            updateThumbPosAndPage({ thumbTop: scrollbarThumb.offsetTop + event.movementY });
         },
     });
 
     Object.assign(rootElement, {
         onWheelEnd(event) {
-            updateThumbPositionAndPage({ pageDelta: Math.sign(event.deltaY) });
+            updateThumbPosAndPage({ pageDelta: Math.sign(event.deltaY) });
         },
         replaceChildren,
         overwrite,
@@ -959,9 +1022,9 @@ Create.view = (() => {
                 border: 3px solid var(--view-border-color);
                 border-radius: var(--view-radius);
                 color: var(--view-border-color);
-                z-index: ${topMostZIndex};
+                z-index: ${ topMostZIndex };
 
-                &.closed {
+                &[hidden] {
                     visibility: hidden;
                 }
                 &.horizontally-center {
@@ -996,7 +1059,7 @@ Create.view = (() => {
         `);
 
         const rootElement = Util.elementize(/*html*/`
-            <article id="${ id }" class="view closed">
+            <article id="${ id }" class="view" hidden>
                 <h2>${ title }</h2>
                 <section></section>
             </article>
@@ -1017,7 +1080,7 @@ Create.view = (() => {
             shouldCaptureBubblingDragEvent: true,
 
             onDragStart() {
-                rootElement.style.zIndex = topMostZIndex++;
+                rootElement.style.zIndex = ++topMostZIndex;
             },
 
             onWindowResizeEnd() {
@@ -1026,13 +1089,6 @@ Create.view = (() => {
                     top: '',
                     margin: '',
                 });
-            },
-
-            open() {
-                rootElement.classList.remove('closed');
-            },
-            close() {
-                rootElement.classList.add('closed');
             },
             innerSpace: $('section', rootElement),
         });
