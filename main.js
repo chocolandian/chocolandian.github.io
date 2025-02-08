@@ -345,7 +345,7 @@ import {
     Object.assign(favicon, {
         rel: 'shortcut icon',
         onOutfitJsonLoaded(json) {
-            favicon.href = json.items[json.character.clothes].icon;
+            favicon.href = json.items[json.thumbnail].icon;
         },
     });
     $('head').append(favicon);
