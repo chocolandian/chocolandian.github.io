@@ -289,14 +289,7 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
 
     const waitForEnd = (callback, delayMs = 100) => {
         let debounceTimer = 0;
-        let isFirstTime = true;
-
         return function() {
-            if (isFirstTime) {
-                isFirstTime = false;
-                callback.apply(this, arguments);
-                return;
-            }
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => callback.apply(this, arguments), delayMs);
         };
@@ -435,10 +428,6 @@ Create.itemSlot = ({
             &:has(.fukidashi) {
                 vertical-align: text-bottom;
             }
-            &:is(p *) {
-                display: inline-block;
-                margin: 0 3px;
-            }
 
             &::before ,
             .item-icon {
@@ -509,7 +498,7 @@ Create.itemSlot = ({
             "></canvas>
         </span>
     `);
-    const dragThumb = $('.item-icon', rootElement);
+    const itemIcon = $('.item-icon', rootElement);
 
     if (gearSlotImageSrc !== null) {
         const gearSlotImage = Util.elementize(/*html*/`
@@ -520,31 +509,31 @@ Create.itemSlot = ({
     }
 
     const redraw = (newItemImageSrc, newPopupImageSrc) => {
-        dragThumb.drawAsync(newItemImageSrc);
-        dragThumb.__popupImageSrc = newPopupImageSrc;
+        itemIcon.drawAsync(newItemImageSrc);
+        itemIcon.__popupImageSrc = newPopupImageSrc;
     };
     redraw(itemImageSrc, popupImageSrc);
 
     const resetPos = () => {
-        Object.assign(dragThumb.style, {
+        Object.assign(itemIcon.style, {
             left: '',
             top: '',
             zIndex: '',
         });
     };
 
-    Object.assign(dragThumb, {
+    Object.assign(itemIcon, {
         onDragStart(event) {
             if (!isDraggable) {
                 return;
             }
-            const rect = dragThumb.offsetParent.getBoundingClientRect();
+            const rect = itemIcon.offsetParent.getBoundingClientRect();
             Util.grabStart({
                 event,
                 left: rect.x + 17,
                 top: rect.y + 17,
             });
-            dragThumb.style.zIndex = 9999999;
+            itemIcon.style.zIndex = 9999999;
         },
         onDragMove(event, isDragMoved) {
             if (!isDraggable) {
@@ -565,8 +554,8 @@ Create.itemSlot = ({
                 Trigger.onItemDrop(event);
                 return;
             }
-            if (!isDragMoved && dragThumb.__popupImageSrc) {
-                popup.drawAsync(dragThumb.__popupImageSrc).then(() => {
+            if (!isDragMoved && itemIcon.__popupImageSrc) {
+                popup.drawAsync(itemIcon.__popupImageSrc).then(() => {
                     popup.moveToCursor(event);
                 });
             }
@@ -705,10 +694,16 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
                 text-shadow: 1px 1px var(--view-border-color);
             }
             .compact-punctuation {
-                margin-right: -6px;
+                margin-right: -4px;
             }
             hr[hidden] {
                 display: none;
+            }
+            p .item-slot {
+                display: inline-block;
+                border-width: 0 4px;
+                border-style: solid;
+                border-color: transparent;
             }
         }
 
@@ -785,6 +780,21 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
         }
     };
 
+    const removeItemSlotSpaces = (p) => {
+        if (!p.matches?.('p')) {
+            return;
+        }
+        for (const itemSlot of $$('.item-slot', p)) {
+            itemSlot.setAttribute('style', '');
+            if (itemSlot.offsetLeft === p.offsetLeft) {
+                itemSlot.style.borderLeftWidth = px(0);
+            }
+            if (itemSlot === p.lastChild) {
+                itemSlot.style.borderRightWidth = px(0);
+            }
+        }
+    };
+
     let pages;
     const replaceChildren = (...staticElementList) => {
         const createPage = (firstChild) => {
@@ -795,17 +805,20 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
         };
 
         const pageMaxHeight = scrollable.clientHeight;
-        scrollable.classList.remove('completed');
         Util.clearChildrenPropsBeforeEmptying(scrollable);
         scrollable.innerHTML = '';
+        scrollable.classList.remove('completed');
 
         let page = createPage(staticElementList.shift());
         page.classList.add('active');
         scrollable.append(page);
+        removeItemSlotSpaces(page.firstChild);
 
         for (const element of staticElementList) {
             page.append(element);
             element.hidden = false;
+            removeItemSlotSpaces(element);
+
             if (page.scrollHeight > pageMaxHeight) {
                 if (element.localName === 'hr') {
                     element.hidden = true;
@@ -1075,6 +1088,7 @@ Create.view = (() => {
                     padding: 1px 1px 0;
                     margin: -1px -1px 0;
                     text-indent: 0.25em;
+                    -webkit-user-select: none;
                     user-select: none;
                     touch-action: pinch-zoom;
                 }
@@ -1141,6 +1155,7 @@ Create.view = (() => {
 export {
     $,
     $$,
+    px,
     Util,
     Trigger,
     popup,

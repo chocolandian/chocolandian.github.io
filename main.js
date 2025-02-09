@@ -419,6 +419,7 @@ import {
         body:has(#overlay-404:not([hidden])) main {
             filter: brightness(0.5);
             pointer-events: none;
+            -webkit-user-select: none;
             user-select: none;
         }
         main {
