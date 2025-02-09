@@ -148,7 +148,6 @@ import {
 
             >section {
                 margin: 10px;
-                touch-action: pinch-zoom;
             }
         }
         @media (height < 480px) or (width < 630px) {
@@ -168,6 +167,7 @@ import {
             display: flex;
             justify-content: flex-start;
             align-items: flex-end;
+            -webkit-user-select: none;
             user-select: none;
             position: relative;
 
@@ -189,6 +189,7 @@ import {
                 bottom: 0;
                 width: 30px;
                 height: 30px;
+                font-size: 0;
                 background-image: url("data:image/svg+xml;charset=utf-8,<svg viewBox='-50 -50 100 100' xmlns='http://www.w3.org/2000/svg'><circle fill='white' r='50' cx='0' cy='0'></circle><circle fill='rgb(232,113,53)' r='44' cx='0' cy='0'></circle><circle fill='white' r='35' cx='0' cy='0'></circle><rect fill='rgb(32,43,96)' x='-11' y='-30' width='22' height='58'></rect><rect fill='white' x='-12' y='-18' width='24' height='6'></rect></svg>");
 
                 &[aria-selected="true"] {
@@ -251,7 +252,7 @@ import {
             tabPanel: null,
         },
         info: {
-            tabText: '',
+            tabText: 'インフォ',
             tab: null,
             tabPanel: null,
         },
@@ -262,8 +263,8 @@ import {
         const tab = document.createElement('li');
         Object.assign(tab, {
             id: `message-${ tabName }-tab`,
-            textContent: messageView[tabName].tabText,
             role: 'tab',
+            textContent: messageView[tabName].tabText,
             ariaSelected: false,
         });
 
@@ -341,8 +342,6 @@ import {
             $(`[data-href="${ json.filename }"]`, messageView.character.tabPanel).classList.add('equipped');
             messageView.hidden = false;
         },
-
-        shouldCaptureBubblingDragEvent: true,
 
         onDragEnd(event, isDragMoved) {
             if (isDragMoved) {

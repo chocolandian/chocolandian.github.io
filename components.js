@@ -113,7 +113,7 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
         let ancestor = event.target;
         while (ancestor?.parentNode?.closest && !event.propagationStopped) {
             ancestor[eventName]?.(event, ...args);
-            ancestor = ancestor.parentNode.closest('.shouldCaptureBubblingDragEvent');
+            ancestor = ancestor.parentNode.closest('.' + eventName);
         }
     };
 
@@ -216,7 +216,17 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
 
 
 {
+    Util.addStyleRules(/*css*/`
+        .onDragMove,
+        .onSwipeX,
+        .onSwipeY {
+            touch-action: pinch-zoom;
+        }
+    `);
     for (const customPropName of [
+        'onDragStart',
+        'onDragMove',
+        'onDragEnd',
         'onSwipeX',
         'onSwipeY',
         'onWheelEnd',
@@ -226,7 +236,6 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
         'onMainJsonLoaded',
         'onOutfitJsonLoaded',
         'onNotFound',
-        'shouldCaptureBubblingDragEvent',
     ]) {
         Object.defineProperty(HTMLElement.prototype, customPropName, {
             get() {
@@ -252,14 +261,12 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
     }
 
     const enableSwipe = (swipeableElement) => {
-        if (Object.hasOwn(swipeableElement, 'onDragStart')) {
+        if (swipeableElement?.onDragStart) {
             return;
         }
         let dragStartEvent = null;
 
         Object.assign(swipeableElement, {
-            shouldCaptureBubblingDragEvent: true,
-
             onDragStart(event) {
                 dragStartEvent = event.pointerType === 'touch' ? event : null;
             },
@@ -298,7 +305,11 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
     const resizeObserver = new ResizeObserver(
         waitForEnd((entries) => {
             for (const entry of entries) {
-                entry.target.onResizeEnd?.(entry);
+                if (entry.target.matches('.resize-observer-initialized')) {
+                    entry.target.onResizeEnd(entry);
+                } else {
+                    entry.target.classList.add('resize-observer-initialized');
+                }
             }
         })
     );
@@ -361,7 +372,6 @@ const popup = Util.elementize(/*html*/`
         #popup {
             z-index: 9999999;
             position: absolute;
-            touch-action: pinch-zoom;
 
             &[hidden] {
                 visibility: hidden;
@@ -442,7 +452,6 @@ Create.itemSlot = ({
             }
             .item-icon {
                 z-index: 2;
-                touch-action: pinch-zoom;
             }
         }
 
@@ -677,7 +686,6 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
             width: 100%;
             border-top-left-radius: var(--view-radius);
             border-bottom-left-radius: var(--view-radius);
-            touch-action: pinch-zoom;
 
             &:not(.completed) .page {
                 visibility: hidden;
@@ -745,7 +753,6 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
                 border: 1px solid rgb(58, 188, 203);
                 background-color: rgb(95, 255, 234);
                 border-radius: 3px;
-                touch-action: pinch-zoom;
             }
             &.disabled .scrollbar-thumb {
                 visibility: hidden;
@@ -767,10 +774,7 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
     const scrollbarThumb = $('.scrollbar-thumb', rootElement);
 
 
-    let maxThumbTop;
     const onResizeEnd = async () => {
-        maxThumbTop = scrollbar.clientHeight - scrollbarThumb.offsetHeight;
-
         const fragment = new DocumentFragment();
         for (const page of $$('.page', scrollable)) {
             fragment.append(...page.children);
@@ -795,8 +799,13 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
         }
     };
 
+
     let pages;
+    let maxThumbTop;
+
     const replaceChildren = (...staticElementList) => {
+        maxThumbTop = scrollbar.clientHeight - scrollbarThumb.offsetHeight;
+
         const createPage = (firstChild) => {
             const page = document.createElement('div');
             page.className = 'page';
@@ -839,6 +848,7 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
     const updateThumbPosAndPage = (() => {
         let currentPageIndex;
         return ({ pageDelta = 0, thumbTop = null } = {}) => {
+
             const indexRatio = (pages.length - 1) / maxThumbTop;
             if (indexRatio <= 0) {
                 return;
@@ -883,17 +893,23 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
                 return `<p>${ line }</p>`;
             })
             .join('')
-            .replace(emojiRegex, '<span class="emoji">$&</span>')
-            .replace(/(、)(\[|「)/g, ($0, $1, $2) => {
-                return `<span class="compact-punctuation">${ $1 }</span>${ $2 }`;
-            })
-            .replace(/\[(.+?)\]/g, ($0, $1) => {
-                const itemNames = $1.split('|');
-                const shortName = itemNames[0];
-                const fullName = itemNames[1] || shortName;
-                return `<temp-item-slot>${ fullName }</temp-item-slot>${ shortName }`;
-            })
-            + '</div>');
+            .replace(
+                emojiRegex,
+                /*html*/`<span class="emoji" translate="no">$&</span>`
+            )
+            .replace(
+                /(、)(\[|「)/g,
+                ($0, $1, $2) => /*html*/`<span class="compact-punctuation">${ $1 }</span>${ $2 }`
+            )
+            .replace(
+                /\[(.+?)\]/g,
+                ($0, $1) => {
+                    const [shortName, fullName] = $1.split('|');
+                    return /*html*/`
+                        <temp-item-slot>${ fullName || shortName }</temp-item-slot>${ shortName }
+                    `;
+                }
+            ) + '</div>');
 
         for (const tempItemSlot of $$('temp-item-slot', articleElement)) {
             const item = json.items[tempItemSlot.textContent];
@@ -1053,11 +1069,9 @@ Create.characterSlot = ({
 
 
 
-
-Create.view = (() => {
+{
     let topMostZIndex = 3;
-
-    return (id, title, isHorizontallyCentered = true) => {
+    Create.view = (id, title, isHorizontallyCentered = true) => {
         Util.addStyleRules(/*css*/`
             .view {
                 display: flex;
@@ -1090,7 +1104,6 @@ Create.view = (() => {
                     text-indent: 0.25em;
                     -webkit-user-select: none;
                     user-select: none;
-                    touch-action: pinch-zoom;
                 }
                 >section {
                     margin: 5px;
@@ -1132,8 +1145,6 @@ Create.view = (() => {
         });
 
         Object.assign(rootElement, {
-            shouldCaptureBubblingDragEvent: true,
-
             onDragStart() {
                 rootElement.style.zIndex = ++topMostZIndex;
             },
@@ -1149,11 +1160,10 @@ Create.view = (() => {
         });
         return rootElement;
     };
-})();
+}
 
 
-
-Create.background = (() => {
+{
     const intersectionObserver = new IntersectionObserver((entries) => {
         for (const entry of entries) {
             entry.target.style.visibility = entry.isIntersecting ? '' : 'hidden';
@@ -1164,7 +1174,7 @@ Create.background = (() => {
         threshold: 0.6,
     });
 
-    return ({
+    Create.background = ({
         imageName,
         imageAlt,
         sprites,
@@ -1223,7 +1233,7 @@ Create.background = (() => {
         }
         return rootElement;
     };
-})();
+}
 
 
 export {
