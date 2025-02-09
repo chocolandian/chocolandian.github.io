@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
-    <link rel="preload" href="/json/main.json" as="fetch" crossorigin="anonymous">
-    <link rel="preload" href="/json/hapinesuwanpi.json" as="fetch" crossorigin="anonymous">
+    <link rel="preload" as="fetch" href="/json/main.json" crossorigin="anonymous">
+    <link rel="preload" as="fetch" href="/json/hapinesuwanpi.json" crossorigin="anonymous">
+    <link rel="preload" as="image" href="/images/background/wistera.avif" type="image/avif">
     <script src="/components.js" type="module"></script>
     <script src="/main.js" type="module"></script>
     <title>チョコットランドのコーデが好きすぎる</title>
@@ -92,9 +93,6 @@
         &:last-child {
             margin-bottom: 0;
         }
-        &:has(>small:first-child:last-child) {
-            line-height: revert;
-        }
     }
     img,
     canvas {
@@ -157,27 +155,6 @@
     main {
         position: relative;
         overflow: hidden;
-
-        >* {
-            position: absolute;
-        }
-        >#background {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-
-            picture img,
-            >figure {
-                position: absolute;
-                margin: auto;
-            }
-            picture img {
-                inset: -999%;
-            }
-        }
-        &:has(>#background~*:hover)>#background {
-            pointer-events: none;
-        }
     }
     </style>
 </head>
@@ -186,14 +163,7 @@
     <header id="title-bar">
         <h1 aria-label="チョコットランドのコーデが好きすぎる">チョコ<span class="ellipsis-on-mobile">ット</span>ラン<span class="ellipsis-on-mobile">ド</span>のコーデが好きすぎる</h1>
     </header>
-    <main>
-        <div id="background">
-            <picture>
-                <source type="image/avif" srcset="/images/background/wistera.avif">
-                <img src="/images/background/wistera.webp" alt="ウィステラの街" width="1920" height="1080">
-            </picture>
-        </div>
-    </main>
+    <main></main>
 </body>
 
 </html>

@@ -8,6 +8,34 @@ import {
 
 
 {
+    const backgroundContainer = Util.elementize(/*html*/`
+        <div id="background-container"></div>
+    `);
+    $('main').append(backgroundContainer);
+
+    Util.addStyleRules(/*css*/`
+        #background-container {
+            width: 100%;
+            height: 100%;
+        }
+        main:has(>:not(#background-container):hover)>#background-container {
+            pointer-events: none;
+        }
+    `);
+    const backgrounds = {};
+
+    Object.assign(backgroundContainer, {
+        onMainJsonLoaded(json) {
+            Object.assign(backgrounds, json.backgrounds);
+
+            const background = Create.background(backgrounds[0]);
+            backgroundContainer.prepend(background);
+        },
+    });
+}
+
+
+{
     const characterView = Create.view('character-view', 'Character');
     $('main').append(characterView);
 
@@ -93,7 +121,7 @@ import {
             }
         },
 
-        onOutfitJsonLoaded(json, name) {
+        onOutfitJsonLoaded(json) {
             for (const itemSlot of $$('.item-slot', characterGears)) {
                 const gearName = json.character[itemSlot.id];
                 const base64Images = json.items[gearName];
@@ -102,7 +130,7 @@ import {
                     base64Images?.popup || ''
                 );
             }
-            characterView.outfit.replace(`/images/character/${ name }.webp`);
+            characterView.outfit.replace(`/images/character/${ json.filename }.webp`);
             characterView.hidden = false;
         },
     });
@@ -308,9 +336,9 @@ import {
             switchTabPanel();
         },
 
-        onOutfitJsonLoaded(json, name) {
+        onOutfitJsonLoaded(json) {
             $('.equipped', messageView.character.tabPanel)?.classList.remove('equipped');
-            $(`[data-href="${ name }"]`, messageView.character.tabPanel).classList.add('equipped');
+            $(`[data-href="${ json.filename }"]`, messageView.character.tabPanel).classList.add('equipped');
             messageView.hidden = false;
         },
 
@@ -502,8 +530,10 @@ if (location.hash.startsWith('#404')) {
     }
 }
 
+
 {
     let outfitJsonName = null;
+
     const fetchOutfitJsonOrNullAsync = async (forceDefault = false) => {
         const defaultName = 'hapinesuwanpi';
         const newName = forceDefault
@@ -513,97 +543,36 @@ if (location.hash.startsWith('#404')) {
         if (outfitJsonName === newName) {
             return null;
         }
-        const outfitJsonOrNull = await fetchJsonOrNullAsync(newName);
-        if (outfitJsonOrNull === null) {
+
+        const outfitJson = await fetchJsonOrNullAsync(newName);
+        if (outfitJson === null) {
             console.error(`Failed to fetch ${ newName }.json due to previous error.`);
             Trigger.onNotFound();
             return null;
         }
+
         outfitJsonName = newName;
         localStorage.lastViewedOutfit = outfitJsonName;
-        return outfitJsonOrNull;
+        return outfitJson;
     };
 
-    const [mainJsonOrNull, outfitJsonOrNull] = await Promise.all([
+
+    const [mainJson, outfitJson] = await Promise.all([
         fetchJsonOrNullAsync('main'),
         (async () => await fetchOutfitJsonOrNullAsync() ?? await fetchOutfitJsonOrNullAsync(true))(),
     ]);
-    if (!mainJsonOrNull || !outfitJsonOrNull) {
+    if (!mainJson || !outfitJson) {
         throw new Error('Failed to fetch the default JSON file.');
     }
-    Trigger.onMainJsonLoaded(mainJsonOrNull);
-    Trigger.onOutfitJsonLoaded(outfitJsonOrNull, outfitJsonName);
+
+    Trigger.onMainJsonLoaded(mainJson);
+    Trigger.onOutfitJsonLoaded(outfitJson);
 
     window.addEventListener('hashchange', async () => {
         history.replaceState(null, '', '/' + location.hash);
-        const jsonOrNull = await fetchOutfitJsonOrNullAsync();
-        if (jsonOrNull) {
-            Trigger.onOutfitJsonLoaded(jsonOrNull, outfitJsonName);
+        const outfitJson = await fetchOutfitJsonOrNullAsync();
+        if (outfitJson) {
+            Trigger.onOutfitJsonLoaded(outfitJson);
         }
     });
-}
-
-
-
-{
-    const background = $('#background');
-    const images = {
-        '/images/background/hapinesuwanpi-sitting.webp': {
-            left: 345,
-            top: -150,
-            isSitting: true,
-        },
-        '/images/character/yuruusapa-ka-momo.webp': {
-            left: -360,
-            top: 50,
-            isReverse: true,
-        },
-        '/images/background/tsukiyononaitoweashiro-fainting.webp': {
-            left: -450,
-            top: -100,
-            isReverse: true,
-            isSitting: true,
-        },
-        '/images/background/wabijinnadeshiko-preparing.webp': {
-            left: 410,
-            top: -10,
-            isReverse: true,
-            isAttacking: true,
-        },
-        '/images/background/training-barrel.webp': {
-            left: 460,
-            top: -4,
-            isAlwaysVisible: true,
-        },
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-            entry.target.style.visibility = entry.isIntersecting ? '' : 'hidden';
-        }
-    }, {
-        root: background,
-        rootMargin: '20px 20px 20px 0px',
-        threshold: 0.6,
-    });
-
-    for (const [imageSrc, option] of Object.entries(images)) {
-        const outfit = Create.outfit({
-            imageSrc,
-            isReverse: option.isReverse,
-            isSitting: option.isSitting,
-            isAttacking: option.isAttacking,
-        });
-
-        if (!option.isAlwaysVisible) {
-            observer.observe(outfit);
-        }
-        outfit.style.inset = `
-            ${ option.top }px
-            ${ -option.left }px
-            ${ -option.top }px
-            ${ option.left }px
-        `;
-        background.append(outfit);
-    }
 }

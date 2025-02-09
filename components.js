@@ -423,11 +423,6 @@ Create.itemSlot = ({
             width: 32px;
             height: 32px;
             background-color: var(--view-background-color);
-            vertical-align: top;
-
-            &:has(.fukidashi) {
-                vertical-align: text-bottom;
-            }
 
             &::before ,
             .item-icon {
@@ -704,6 +699,11 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
                 border-width: 0 4px;
                 border-style: solid;
                 border-color: transparent;
+                vertical-align: top;
+
+                &:has(.fukidashi) {
+                    vertical-align: text-bottom;
+                }
             }
         }
 
@@ -1147,6 +1147,80 @@ Create.view = (() => {
             },
             innerSpace: $('section', rootElement),
         });
+        return rootElement;
+    };
+})();
+
+
+
+Create.background = (() => {
+    const intersectionObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+            entry.target.style.visibility = entry.isIntersecting ? '' : 'hidden';
+        }
+    }, {
+        root: $('main'),
+        rootMargin: '20px 20px 20px 0px',
+        threshold: 0.6,
+    });
+
+    return ({
+        imageName,
+        imageAlt,
+        sprites,
+    }) => {
+        Util.addStyleRules(/*css*/`
+            .background {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+
+                picture img,
+                >figure {
+                    position: absolute;
+                    margin: auto;
+                }
+                picture img {
+                    inset: -999%;
+                }
+            }
+        `);
+        const rootElement = Util.elementize(/*html*/`
+            <div class="background" data-image-name="${ imageName }">
+                <picture>
+                    <source
+                        type="image/avif"
+                        srcset="/images/background/${ imageName }.avif"
+                    >
+                    <img
+                        src="/images/background/${ imageName }.webp"
+                        alt="${ imageAlt }"
+                        width="1920"
+                        height="1080"
+                    >
+                </picture>
+            </div>
+        `);
+
+        for (const [imageSrc, option] of Object.entries(sprites)) {
+            const outfit = Create.outfit({
+                imageSrc,
+                isReverse: option.isReverse,
+                isSitting: option.isSitting,
+                isAttacking: option.isAttacking,
+            });
+
+            if (!option.isAlwaysVisible) {
+                intersectionObserver.observe(outfit);
+            }
+            outfit.style.inset = `
+                ${ option.top }px
+                ${ -option.left }px
+                ${ -option.top }px
+                ${ option.left }px
+            `;
+            rootElement.append(outfit);
+        }
         return rootElement;
     };
 })();
