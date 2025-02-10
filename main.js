@@ -99,8 +99,8 @@ import {
             boots: null,
         },
         onItemDrop(item) {
-            if (item.dataset.href) {
-                location.hash = item.dataset.href;
+            if (item.parentNode.href) {
+                location.hash = item.parentNode.getAttribute('href');
             }
         },
     });
@@ -224,7 +224,7 @@ import {
         }
 
         #message-character-tab-panel {
-            .page.active {
+            .page:not([hidden]) {
                 display: grid;
                 gap: .5em;
             }
@@ -291,12 +291,11 @@ import {
                 if (!details.thumbnail) continue;
 
                 details.itemSlots = character.outfitList.map(outfit => {
-                    const itemSlot = Create.itemSlot({
+                    return Create.itemSlot({
                         itemImageSrc: json.globalImages[outfit.thumbnail],
                         isFramed: true,
+                        href: outfit.filename,
                     });
-                    $('canvas', itemSlot).dataset.href = outfit.json;
-                    return itemSlot;
                 });
                 fragment.append(Create.characterSlot(details));
             }
@@ -338,8 +337,9 @@ import {
         },
 
         onOutfitJsonLoaded(json) {
-            $('.equipped', messageView.character.tabPanel)?.classList.remove('equipped');
-            $(`[data-href="${ json.filename }"]`, messageView.character.tabPanel).classList.add('equipped');
+            const tab = messageView.character.tabPanel;
+            $('.equipped', tab)?.classList.remove('equipped');
+            $(`[href="#${ json.filename }"] .item-icon`, tab).classList.add('equipped');
             messageView.hidden = false;
         },
 
@@ -349,8 +349,8 @@ import {
             }
             if (event.target.matches('.equipped')) {
                 switchTabPanel(messageView.outfit.tab);
-            } else if (event.target.matches('[data-href]')) {
-                location.hash = event.target.dataset.href;
+            } else if (event.target.matches('a>.item-icon')) {
+                location.hash = event.target.parentNode.getAttribute('href');
             }
         },
     });

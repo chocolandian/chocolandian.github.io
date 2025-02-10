@@ -63,6 +63,11 @@ const Util = {
     async hashize(message) {
         return [...new Uint8Array(await crypto.subtle.digest('SHA-1',new TextEncoder().encode(message)))].map(b=>b.toString(16).padStart(2,'0')).join('');
     },
+
+    preventEvent(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    },
 };
 
 
@@ -104,11 +109,6 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
 
 
 {
-    const preventEvent = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-    };
-
     const propagateDragEvent = (eventName, event, ...args) => {
         let ancestor = event.target;
         while (ancestor?.parentNode?.closest && !event.propagationStopped) {
@@ -174,7 +174,7 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
 
         if (event.pointerType === 'touch') {
             for (const eventName of ['mousedown', 'mouseup']) {
-                document.addEventListener(eventName, preventEvent, { once: true });
+                document.addEventListener(eventName, Util.preventEvent, { once: true });
             }
         }
         if (Util.isAnyNodeSelected() || primaryPointerEvent.target !== event.target) {
@@ -211,7 +211,12 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
     document.addEventListener('pointermove', pointerMove, { passive: true });
     document.addEventListener('pointerup', pointerUp, { passive: true });
     document.addEventListener('pointercancel', pointerUp, { passive: true });
-    document.addEventListener('dragstart', preventEvent);
+    document.addEventListener('dragstart', Util.preventEvent);
+    document.addEventListener('click', (event) => {
+        if (event.target.closest('a[href^="#"]')) {
+            Util.preventEvent(event);
+        }
+    });
 }
 
 
@@ -261,7 +266,7 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
     }
 
     const enableSwipe = (swipeableElement) => {
-        if (swipeableElement?.onDragStart) {
+        if (swipeableElement.onDragStart) {
             return;
         }
         let dragStartEvent = null;
@@ -367,6 +372,8 @@ const Trigger = {
 const popup = Util.elementize(/*html*/`
     <canvas id="popup" hidden></canvas>
 `);
+$('main').append(popup);
+
 {
     Util.addStyleRules(/*css*/`
         #popup {
@@ -412,7 +419,6 @@ const popup = Util.elementize(/*html*/`
             popup.hidden = true;
         },
     });
-    $('main').append(popup);
 }
 
 
@@ -422,6 +428,7 @@ Create.itemSlot = ({
     itemImageSrc = null,
     popupImageSrc = null,
     gearSlotImageSrc = null,
+    href = null,
     isDraggable = true,
     isShadowed = true,
     isFramed = false,
@@ -434,6 +441,10 @@ Create.itemSlot = ({
             height: 32px;
             background-color: var(--view-background-color);
 
+            &[href] {
+                -webkit-tap-highlight-color: transparent;
+                cursor: inherit;
+            }
             &::before ,
             .item-icon {
                 position: absolute;
@@ -490,8 +501,11 @@ Create.itemSlot = ({
         }
     `);
 
+    const tagName = href ? 'a' : 'span';
     const rootElement = Util.elementize(/*html*/`
-        <span class="
+        <${ tagName }
+        ${ href ? `href="#${ href }"` : ''}
+        class="
             item-slot
             ${ isFramed ? 'framed' : '' }
             ${ isShadowed ? 'shadowed' : '' }
@@ -500,7 +514,7 @@ Create.itemSlot = ({
                 item-icon
                 ${ isFukidashi ? 'fukidashi' : '' }
             "></canvas>
-        </span>
+        </${ tagName }>
     `);
     const itemIcon = $('.item-icon', rootElement);
 
@@ -663,7 +677,7 @@ Create.outfit = ({
 
 
 
-Create.scrollableSection = (isThumbPosDiscrete = false) => {
+Create.scrollableSection = () => {
     Util.addStyleRules(/*css*/`
         .scrollable-section {
             position: relative;
@@ -687,10 +701,10 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
             border-top-left-radius: var(--view-radius);
             border-bottom-left-radius: var(--view-radius);
 
-            &:not(.completed) .page {
+            &[hidden] .page:not([hidden]) {
                 visibility: hidden;
             }
-            &.completed .page:not(.active) {
+            &:not([hidden]) .page[hidden] {
                 display: none;
             }
             .emoji {
@@ -753,9 +767,10 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
                 border: 1px solid rgb(58, 188, 203);
                 background-color: rgb(95, 255, 234);
                 border-radius: 3px;
-            }
-            &.disabled .scrollbar-thumb {
-                visibility: hidden;
+
+                &[hidden] {
+                    visibility: hidden;
+                }
             }
         }
     `);
@@ -764,8 +779,8 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
     const rootElement = Util.elementize(/*html*/`
         <div class="scrollable-section">
             <div class="scrollable"></div>
-            <div class="scrollbar disabled">
-                <div class="scrollbar-thumb"></div>
+            <div class="scrollbar">
+                <div class="scrollbar-thumb" hidden></div>
             </div>
         </div>
     `);
@@ -807,8 +822,7 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
         maxThumbTop = scrollbar.clientHeight - scrollbarThumb.offsetHeight;
 
         const createPage = (firstChild) => {
-            const page = document.createElement('div');
-            page.className = 'page';
+            const page = Util.elementize(/*html*/`<div class="page" hidden></div>`);
             page.append(firstChild);
             return page;
         };
@@ -816,10 +830,10 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
         const pageMaxHeight = scrollable.clientHeight;
         Util.clearChildrenPropsBeforeEmptying(scrollable);
         scrollable.innerHTML = '';
-        scrollable.classList.remove('completed');
+        scrollable.hidden = true;
 
         let page = createPage(staticElementList.shift());
-        page.classList.add('active');
+        page.hidden = false;
         scrollable.append(page);
         removeItemSlotSpaces(page.firstChild);
 
@@ -837,9 +851,9 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
                 scrollable.append(page);
             }
         }
-        scrollable.classList.add('completed');
+        scrollable.hidden = false;
         pages = [...scrollable.children];
-        scrollbar.classList[pages.length < 2 ? 'add' : 'remove']('disabled');
+        scrollbarThumb.hidden = (pages.length < 2);
 
         updateThumbPosAndPage();
     };
@@ -847,33 +861,30 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
 
     const updateThumbPosAndPage = (() => {
         let currentPageIndex;
-        return ({ pageDelta = 0, thumbTop = null } = {}) => {
+        return ({ pageDelta = null, thumbTop = null } = {}) => {
 
             const indexRatio = (pages.length - 1) / maxThumbTop;
             if (indexRatio <= 0) {
                 return;
             }
-            const newIndex = (() => {
-                if (pageDelta === 0 && thumbTop === null) {
-                    currentPageIndex = null;
-                    return 0;
-                }
-                const _newIndex = (thumbTop === null)
+            if (pageDelta === null && thumbTop === null) {
+                currentPageIndex = 0;
+            } else {
+                const _newIndex = pageDelta
                     ? currentPageIndex + pageDelta
                     : Math.round(thumbTop * indexRatio);
-                return Util.clampNum(0, _newIndex, pages.length - 1);
-            })();
+                const newIndex = Util.clampNum(0, _newIndex, pages.length - 1);
 
-            if (currentPageIndex !== newIndex) {
-                pages[currentPageIndex]?.classList.remove('active');
-                pages[newIndex].classList.add('active');
-                currentPageIndex = newIndex;
+                if (currentPageIndex !== newIndex) {
+                    pages[currentPageIndex].hidden = true;
+                    currentPageIndex = newIndex;
+                }
             }
+            pages[currentPageIndex].hidden = false;
+            thumbTop ??= currentPageIndex / indexRatio;
 
-            const newThumbTop = (thumbTop === null || isThumbPosDiscrete)
-                ? currentPageIndex / indexRatio
-                : thumbTop;
-            scrollbarThumb.style.top = px(Util.clampNum(0, newThumbTop, maxThumbTop));
+            const newThumbTop = Util.clampNum(0, thumbTop, maxThumbTop);
+            scrollbarThumb.style.top = px(newThumbTop);
         };
     })();
 
@@ -898,16 +909,16 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
                 /*html*/`<span class="emoji" translate="no">$&</span>`
             )
             .replace(
-                /(、)(\[|「)/g,
+                /(、)(\$\[|「)/g,
                 ($0, $1, $2) => /*html*/`<span class="compact-punctuation">${ $1 }</span>${ $2 }`
             )
             .replace(
-                /\[(.+?)\]/g,
+                /\$\[(.+?)\]/g,
                 ($0, $1) => {
                     const [shortName, fullName] = $1.split('|');
                     return /*html*/`
                         <temp-item-slot>${ fullName || shortName }</temp-item-slot>${ shortName }
-                    `;
+                    `.trim();
                 }
             ) + '</div>');
 
@@ -951,6 +962,9 @@ Create.scrollableSection = (isThumbPosDiscrete = false) => {
         onDragMove(event) {
             updateThumbPosAndPage({ thumbTop: event.pageY - scrollbarThumb.grabStartTop });
         },
+        onDragEnd(event) {
+            event.stopPropagation();
+        }
     });
 
     Object.assign(rootElement, {
@@ -1070,7 +1084,7 @@ Create.characterSlot = ({
 
 
 {
-    let topMostZIndex = 3;
+    let topMostZIndex = 10;
     Create.view = (id, title, isHorizontallyCentered = true) => {
         Util.addStyleRules(/*css*/`
             .view {
@@ -1146,7 +1160,7 @@ Create.characterSlot = ({
 
         Object.assign(rootElement, {
             onDragStart() {
-                rootElement.style.zIndex = ++topMostZIndex;
+                rootElement.style.zIndex = topMostZIndex++;
             },
 
             onWindowResizeEnd() {
