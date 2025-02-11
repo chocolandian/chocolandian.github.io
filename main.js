@@ -124,11 +124,8 @@ import {
         onOutfitJsonLoaded(json) {
             for (const itemSlot of $$('.item-slot', characterGears)) {
                 const gearName = json.character[itemSlot.id];
-                const base64Images = json.items[gearName];
-                itemSlot.redraw(
-                    base64Images?.icon || '',
-                    base64Images?.popup || ''
-                );
+                const itemImages = json.items[gearName];
+                itemSlot.redraw(itemImages?.icon, itemImages?.popup);
             }
             characterView.outfit.replace(`/images/character/${ json.filename }.webp`);
             characterView.hidden = false;

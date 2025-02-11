@@ -71,7 +71,7 @@ const Util = {
 };
 
 
-HTMLCanvasElement.prototype.drawAsync = async function(src) {
+HTMLCanvasElement.prototype.drawUnblurredImageAsync = async function(src) {
     const context = this.getContext('2d');
     if (!src) {
         context.clearRect(0, 0, this.width, this.height);
@@ -89,7 +89,7 @@ HTMLCanvasElement.prototype.drawAsync = async function(src) {
     this.style.width = px(image.width);
     this.style.height = px(image.height);
 
-    const zoomScale = 4;
+    const zoomScale = 2 ** 2;
     this.width = image.width * zoomScale;
     this.height = image.height * zoomScale;
 
@@ -464,39 +464,39 @@ Create.itemSlot = ({
             .item-icon {
                 z-index: 2;
             }
-        }
 
-        .item-slot.framed {
-            width: 40px;
-            height: 40px;
+            &.framed {
+                width: 40px;
+                height: 40px;
 
-            &::before {
-                border-radius: 6px;
-                background-origin: content-box;
-                padding: 2px;
-                border: var(--scrollbar-track-color) 2px solid;
+                &::before {
+                    border-radius: 6px;
+                    background-origin: content-box;
+                    padding: 2px;
+                    border: var(--scrollbar-track-color) 2px solid;
+                }
+                .item-icon {
+                    top: 4px;
+                    left: 4px;
+                }
             }
-            .item-icon {
-                top: 4px;
-                left: 4px;
-            }
-        }
 
-        .item-slot:has(.gear-slot-image):not(#dummy-selector-for-specificity) {
-            width: 40px;
-            height: 51px;
+            &:has(.gear-slot-image) {
+                width: 40px;
+                height: 51px;
 
-            .gear-slot-image {
-                width: 100%;
-                height: 100%;
-            }
-            &::before,
-            .item-icon {
-                top: 15px;
-                left: 4px;
-            }
-            &:has(>.item-icon:not([data-hashed-src]))::before {
-                content: none;
+                .gear-slot-image {
+                    width: 100%;
+                    height: 100%;
+                }
+                &::before,
+                .item-icon {
+                    top: 15px;
+                    left: 4px;
+                }
+                &:has(.item-icon:not([data-hashed-src]))::before {
+                    content: none;
+                }
             }
         }
     `);
@@ -518,17 +518,17 @@ Create.itemSlot = ({
     `);
     const itemIcon = $('.item-icon', rootElement);
 
-    if (gearSlotImageSrc !== null) {
+    if (gearSlotImageSrc) {
         const gearSlotImage = Util.elementize(/*html*/`
             <canvas class="gear-slot-image"></canvas>
         `);
-        gearSlotImage.drawAsync(gearSlotImageSrc);
+        gearSlotImage.drawUnblurredImageAsync(gearSlotImageSrc);
         rootElement.prepend(gearSlotImage);
     }
 
-    const redraw = (newItemImageSrc, newPopupImageSrc) => {
-        itemIcon.drawAsync(newItemImageSrc);
-        itemIcon.__popupImageSrc = newPopupImageSrc;
+    const redraw = (newItemImageSrc = null, newPopupImageSrc = null) => {
+        itemIcon.drawUnblurredImageAsync(newItemImageSrc ?? '');
+        popupImageSrc = newPopupImageSrc ?? '';
     };
     redraw(itemImageSrc, popupImageSrc);
 
@@ -572,8 +572,8 @@ Create.itemSlot = ({
                 Trigger.onItemDrop(event);
                 return;
             }
-            if (!isDragMoved && itemIcon.__popupImageSrc) {
-                popup.drawAsync(itemIcon.__popupImageSrc).then(() => {
+            if (!isDragMoved && popupImageSrc) {
+                popup.drawUnblurredImageAsync(popupImageSrc).then(() => {
                     popup.moveToCursor(event);
                 });
             }
