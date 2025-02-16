@@ -8,35 +8,31 @@ import {
 
 
 {
-    const backgroundContainer = Util.elementize(/*html*/`
-        <div id="background-container"></div>
+    const snapShotContainer = Util.elementize(/*html*/`
+        <snap-shot-container></snap-shot-container>
     `);
-    $('main').append(backgroundContainer);
+    $('main').append(snapShotContainer);
 
     Util.addStyleRules(/*css*/`
-        #background-container {
-            width: 100%;
-            height: 100%;
-        }
-        main:has(>:not(#background-container):hover)>#background-container {
+        main:has(>:not(snap-shot-container):hover)>snap-shot-container {
             pointer-events: none;
         }
     `);
-    const backgrounds = {};
+    const snapShotSettingsList = {};
 
-    Object.assign(backgroundContainer, {
+    Object.assign(snapShotContainer, {
         onMainJsonLoaded(json) {
-            Object.assign(backgrounds, json.backgrounds);
+            Object.assign(snapShotSettingsList, json.snapShots);
 
-            const background = Create.background(backgrounds[0]);
-            backgroundContainer.prepend(background);
+            const snapShot = Create.snapShot(snapShotSettingsList[0]);
+            snapShotContainer.append(snapShot);
         },
     });
 }
 
 
 {
-    const characterView = Create.view('character-view', 'Character');
+    const characterView = Create.UIView('character-view', 'Character');
     $('main').append(characterView);
 
     Util.addStyleRules(/*css*/`
@@ -51,41 +47,43 @@ import {
                 height: 135px;
             }
         }
-        #character-gears {
+        character-gears {
             display: flex;
             justify-content: space-around;
             align-items: center;
-            margin: 0 30px;
+            margin-inline: 30px;
             height: 100%;
         }
         @media (height < 480px) or (width < 630px) {
-            #character-gears {
-                .outfit {
+            character-gears {
+                character-outfit {
                     margin: -20px -10px -10px -5px;
                 }
             }
         }
         @media (width < 630px) {
-            #character-gears {
+            character-gears {
                 display: grid;
                 width: 320px;
                 max-width: calc(100% - 20px);
                 margin: auto;
 
-                .outfit {
+                character-outfit {
                     grid-row: 1 / 3;
                     margin: -20px;
                 }
-                .item-slot:nth-last-child(-n+4) {
+                item-slot:nth-last-child(-n+4) {
                     grid-row: 2;
                 }
             }
         }
     `);
 
-    characterView.innerSpace.innerHTML = /*html*/`
-        <div id="character-gears"></div>
-    `;
+    const characterGears = Util.elementize(/*html*/`
+        <character-gears></character-gears>`
+    );
+    characterView.innerSpace.append(characterGears);
+
     Object.assign(characterView, {
         outfit: null,
         gears: {
@@ -99,14 +97,10 @@ import {
             boots: null,
         },
         onItemDrop(item) {
-            if (item.parentNode.href) {
-                location.hash = item.parentNode.getAttribute('href');
-            }
+            location.hash = item.closest('a')?.getAttribute('href') || location.hash;
         },
     });
-
-    const characterGears = $('#character-gears');
-    characterView.outfit = Create.outfit();
+    characterView.outfit = Create.characterOutfit();
     characterGears.append(characterView.outfit);
 
     Object.assign(characterGears, {
@@ -122,10 +116,10 @@ import {
         },
 
         onOutfitJsonLoaded(json) {
-            for (const itemSlot of $$('.item-slot', characterGears)) {
+            for (const itemSlot of $$('item-slot', characterGears)) {
                 const gearName = json.character[itemSlot.id];
                 const itemImages = json.items[gearName];
-                itemSlot.redraw(itemImages?.icon, itemImages?.popup);
+                itemSlot.redrawAsync(itemImages?.icon, itemImages?.popUp);
             }
             characterView.outfit.replace(`/images/character/${ json.filename }.webp`);
             characterView.hidden = false;
@@ -135,7 +129,7 @@ import {
 
 
 {
-    const messageView = Create.view('message-view', 'Message');
+    const messageView = Create.UIView('message-view', 'Message');
     $('main').append(messageView);
 
     Util.addStyleRules(/*css*/`
@@ -143,7 +137,7 @@ import {
             top: 180px;
             height: calc(100% - 200px);
 
-            >section {
+            >article {
                 margin: 10px;
             }
         }
@@ -152,14 +146,14 @@ import {
                 top: 150px;
                 height: calc(100% - 160px);
 
-                >section {
+                >article {
                     margin: 0 5px 5px;
                 }
             }
         }
 
-        #message-tab-bar {
-            padding: 0 var(--view-radius);
+        #message-view tab-list {
+            padding-inline: var(--view-radius);
             height: 33px;
             display: flex;
             justify-content: flex-start;
@@ -168,11 +162,11 @@ import {
             user-select: none;
             position: relative;
 
-            li:not(#message-info-tab) {
+            tab-item:not(#message-info-tab) {
                 padding: 2px 10px 0;
                 border-radius: var(--view-radius) var(--view-radius) 0 0;
                 margin-right: 10px;
-                background-color: var(--scrollbar-track-color);
+                background-color: var(--scroll-bar-track-color);
                 color: var(--view-background-color);
                 font-weight: bold;
 
@@ -203,38 +197,34 @@ import {
             }
         }
 
-        #message-tab-panels {
+        #message-view tab-panels {
             position: relative;
 
-            .scrollable-section[hidden] {
-                visibility: hidden;
-                position: absolute;
-            }
-            .scrollable {
+            scroll-pages {
                 border: 3px solid var(--view-border-color);
 
-                >.page {
+                scroll-page {
                     padding: 10px;
-                    padding-right: calc(var(--scrollbar-entire-width) + 6px);
+                    padding-right: calc(var(--scroll-bar-entire-width) + 6px);
                 }
             }
-        }
 
-        #message-character-tab-panel {
-            .page:not([hidden]) {
-                display: grid;
-                gap: .5em;
-            }
-            .item-slot:has(.equipped)::before {
-                border-style: dashed;
+            #message-character-tab-panel {
+                scroll-page {
+                    display: grid;
+                    gap: .5em;
+                }
+                item-slot:has(.equipped)::before {
+                    border-style: dashed;
+                }
             }
         }
     `);
 
     messageView.innerSpace.classList.add('fixed-header-container');
     messageView.innerSpace.innerHTML = /*html*/`
-        <ul id="message-tab-bar" role="tablist"></ul>
-        <div id="message-tab-panels"></div>
+        <tab-list role="tablist"></tab-list>
+        <tab-panels></tab-panels>
     `;
 
     const tabSets = {
@@ -257,7 +247,7 @@ import {
     Object.assign(messageView, tabSets);
 
     for (const tabName of Object.keys(tabSets)) {
-        const tab = document.createElement('li');
+        const tab = Util.elementize(/*html*/`<tab-item></tab-item>`);
         Object.assign(tab, {
             id: `message-${ tabName }-tab`,
             role: 'tab',
@@ -265,7 +255,7 @@ import {
             ariaSelected: false,
         });
 
-        const tabPanel = Create.scrollableSection();
+        const tabPanel = Create.scrollSection();
         Object.assign(tabPanel, {
             id: `message-${ tabName }-tab-panel`,
             role: 'tabpanel',
@@ -275,8 +265,8 @@ import {
         tab.setAttribute('aria-controls', tabPanel.id);
         tabPanel.setAttribute('aria-labelledby', tab.id);
 
-        $('#message-tab-bar').append(tab);
-        $('#message-tab-panels').append(tabPanel);
+        $('tab-list', messageView).append(tab);
+        $('tab-panels', messageView).append(tabPanel);
         Object.assign(messageView[tabName], { tab, tabPanel });
     }
 
@@ -319,7 +309,7 @@ import {
         $(tabPanelId).removeAttribute('hidden');
     };
 
-    for (const tab of $$('#message-tab-bar li')) {
+    for (const tab of $$('tab-list tab-item', messageView)) {
         Object.assign(tab, {
             onDragStart() {
                 switchTabPanel(tab);
@@ -336,7 +326,7 @@ import {
         onOutfitJsonLoaded(json) {
             const tab = messageView.character.tabPanel;
             $('.equipped', tab)?.classList.remove('equipped');
-            $(`[href="#${ json.filename }"] .item-icon`, tab).classList.add('equipped');
+            $(`[href="#${ json.filename }"] item-icon`, tab).classList.add('equipped');
             messageView.hidden = false;
         },
 
@@ -346,18 +336,18 @@ import {
             }
             if (event.target.matches('.equipped')) {
                 switchTabPanel(messageView.outfit.tab);
-            } else if (event.target.matches('a>.item-icon')) {
-                location.hash = event.target.parentNode.getAttribute('href');
+            } else if (event.target.matches('a item-icon')) {
+                location.hash = event.target.closest('a').getAttribute('href');
             }
         },
     });
 
-    Object.assign($('#message-tab-panels'), {
+    Object.assign($('tab-panels', messageView), {
         onSwipeX(swipeDelta) {
-            const selectedTab = $('#message-tab-bar [aria-selected="true"]');
+            const selectedTab = $('tab-list [aria-selected="true"]', messageView);
             const newTab = swipeDelta > 0
-                ? (selectedTab.previousElementSibling ?? selectedTab.parentNode.lastChild)
-                : (selectedTab.nextElementSibling ?? selectedTab.parentNode.firstChild);
+                ? (selectedTab.previousElementSibling ?? selectedTab.parentElement.lastChild)
+                : (selectedTab.nextElementSibling ?? selectedTab.parentElement.firstChild);
             switchTabPanel(newTab);
         },
     });
@@ -377,7 +367,7 @@ import {
 
 
 {
-    const overlay404 = Create.view('overlay-404', '404 Not Found', true);
+    const overlay404 = Create.UIView('overlay-404', '404 Not Found', true);
 
     Util.addStyleRules(/*css*/`
         #overlay-404 {
@@ -386,7 +376,7 @@ import {
             top: 50%;
             transform: translateY(-50%);
 
-            section {
+            article {
                 margin: 10px;
             }
             div {
@@ -395,7 +385,7 @@ import {
                 margin-bottom: 5px;
 
                 time {
-                    padding: 0 0.5em;
+                    padding-inline: 0.5em;
                 }
             }
             button {

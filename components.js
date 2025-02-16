@@ -60,10 +60,6 @@ const Util = {
         return getSelection().rangeCount > 0 && !getSelection().getRangeAt(0).collapsed;
     },
 
-    async hashize(message) {
-        return [...new Uint8Array(await crypto.subtle.digest('SHA-1',new TextEncoder().encode(message)))].map(b=>b.toString(16).padStart(2,'0')).join('');
-    },
-
     preventEvent(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -75,11 +71,11 @@ HTMLCanvasElement.prototype.drawUnblurredImageAsync = async function(src) {
     const context = this.getContext('2d');
     if (!src) {
         context.clearRect(0, 0, this.width, this.height);
-        delete this.dataset.hashedSrc;
+        this.__src = '';
+        this.hidden = true;
         return;
     }
-    const hashedSrc = await Util.hashize(src);
-    if (this.dataset.hashedSrc === hashedSrc) {
+    if (this.__src === src) {
         return;
     }
     const image = new Image();
@@ -95,7 +91,8 @@ HTMLCanvasElement.prototype.drawUnblurredImageAsync = async function(src) {
 
     context.imageSmoothingEnabled = false;
     context.drawImage(image, 0, 0, this.width, this.height);
-    this.dataset.hashedSrc = hashedSrc;
+    this.__src = src;
+    this.hidden = false;
 };
 
 {
@@ -111,9 +108,9 @@ HTMLCanvasElement.prototype.drawUnblurredImageAsync = async function(src) {
 {
     const propagateDragEvent = (eventName, event, ...args) => {
         let ancestor = event.target;
-        while (ancestor?.parentNode?.closest && !event.propagationStopped) {
+        while (ancestor && !event.propagationStopped) {
             ancestor[eventName]?.(event, ...args);
-            ancestor = ancestor.parentNode.closest('.' + eventName);
+            ancestor = ancestor.parentElement?.closest('.' + eventName);
         }
     };
 
@@ -369,24 +366,27 @@ const Trigger = {
 
 
 
-const popup = Util.elementize(/*html*/`
-    <canvas id="popup" hidden></canvas>
+const popUp = Util.elementize(/*html*/`
+    <pop-up>
+        <canvas hidden></canvas>
+    </pop-up>
 `);
-$('main').append(popup);
+$('main').append(popUp);
 
 {
     Util.addStyleRules(/*css*/`
-        #popup {
+        pop-up {
             z-index: 9999999;
             position: absolute;
 
-            &[hidden] {
-                visibility: hidden;
+            canvas {
+                display: block;
+                pointer-events: none;
             }
         }
     `);
 
-    Object.assign(popup, {
+    Object.assign(popUp, {
         onDragStart(event) {
             Util.grabStart({ event });
         },
@@ -398,25 +398,29 @@ $('main').append(popup);
             if (isDragMoved) {
                 return;
             }
-            if (event.offsetY <= 12 && popup.offsetWidth - event.offsetX <= 16) {
+            if (event.offsetY <= 12 && popUp.offsetWidth - event.offsetX <= 16) {
                 setTimeout(() => {
-                    popup.hidden = true;
+                    popUp.hidden = true;
                 }, 50);
             }
         },
 
         moveToCursor(pointerEvent) {
             const { pageX, pageY } = pointerEvent;
-            const maxLeft = $('main').clientWidth - popup.offsetWidth;
-            const maxTop = $('main').clientHeight - popup.offsetHeight;
+            const maxLeft = $('main').clientWidth - popUp.offsetWidth;
+            const maxTop = $('main').clientHeight - popUp.offsetHeight;
 
-            popup.style.left = px(Util.clampNum(0, pageX - $('main').offsetLeft, maxLeft));
-            popup.style.top = px(Util.clampNum(0, pageY - $('main').offsetTop, maxTop));
-            popup.hidden = false;
+            popUp.style.left = px(Util.clampNum(0, pageX - $('main').offsetLeft, maxLeft));
+            popUp.style.top = px(Util.clampNum(0, pageY - $('main').offsetTop, maxTop));
+            popUp.hidden = false;
+        },
+
+        async redrawAsync(src) {
+            return await $('canvas', popUp).drawUnblurredImageAsync(src);
         },
 
         onWindowResizeEnd() {
-            popup.hidden = true;
+            popUp.hidden = true;
         },
     });
 }
@@ -426,7 +430,7 @@ const Create = {};
 
 Create.itemSlot = ({
     itemImageSrc = null,
-    popupImageSrc = null,
+    popUpImageSrc = null,
     gearSlotImageSrc = null,
     href = null,
     isDraggable = true,
@@ -435,34 +439,36 @@ Create.itemSlot = ({
     isFukidashi = false,
 }) => {
     Util.addStyleRules(/*css*/`
-        .item-slot {
+        item-slot {
             position: relative;
             width: 32px;
             height: 32px;
             background-color: var(--view-background-color);
 
-            &[href] {
-                -webkit-tap-highlight-color: transparent;
-                cursor: inherit;
-            }
             &::before ,
-            .item-icon {
+            item-icon {
                 position: absolute;
                 top: 0;
                 left: 0;
                 width: 32px;
                 height: 32px;
             }
-            &::before {
+            &.shadowed::before {
                 background-image: url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><ellipse cx='16' cy='24' rx='14' ry='8' fill='rgb(212,188,177)'></ellipse></svg>");
                 background-repeat: no-repeat;
                 background-color: var(--view-background-color);
-            }
-            &.shadowed::before {
                 content: "";
             }
-            .item-icon {
+            item-icon {
                 z-index: 2;
+
+                canvas {
+                    pointer-events: none;
+                }
+            }
+            [href] {
+                -webkit-tap-highlight-color: transparent;
+                cursor: inherit;
             }
 
             &.framed {
@@ -473,9 +479,9 @@ Create.itemSlot = ({
                     border-radius: 6px;
                     background-origin: content-box;
                     padding: 2px;
-                    border: var(--scrollbar-track-color) 2px solid;
+                    border: var(--scroll-bar-track-color) 2px solid;
                 }
-                .item-icon {
+                item-icon {
                     top: 4px;
                     left: 4px;
                 }
@@ -490,33 +496,38 @@ Create.itemSlot = ({
                     height: 100%;
                 }
                 &::before,
-                .item-icon {
+                item-icon {
                     top: 15px;
                     left: 4px;
                 }
-                &:has(.item-icon:not([data-hashed-src]))::before {
+                &:has([hidden])::before {
                     content: none;
                 }
             }
         }
     `);
 
-    const tagName = href ? 'a' : 'span';
     const rootElement = Util.elementize(/*html*/`
-        <${ tagName }
-        ${ href ? `href="#${ href }"` : ''}
-        class="
-            item-slot
+        <item-slot class="
             ${ isFramed ? 'framed' : '' }
             ${ isShadowed ? 'shadowed' : '' }
         ">
-            <canvas class="
-                item-icon
-                ${ isFukidashi ? 'fukidashi' : '' }
-            "></canvas>
-        </${ tagName }>
+        </item-slot>
     `);
-    const itemIcon = $('.item-icon', rootElement);
+    const itemIcon = Util.elementize(/*html*/`
+        <item-icon class="${ isFukidashi ? 'fukidashi' : '' }">
+            <canvas></canvas>
+        </item-icon>
+    `);
+
+    if (href) {
+        const anchor = document.createElement('a');
+        anchor.href = '#' + href;
+        rootElement.append(anchor);
+        anchor.append(itemIcon);
+    } else {
+        rootElement.append(itemIcon);
+    }
 
     if (gearSlotImageSrc) {
         const gearSlotImage = Util.elementize(/*html*/`
@@ -526,11 +537,11 @@ Create.itemSlot = ({
         rootElement.prepend(gearSlotImage);
     }
 
-    const redraw = (newItemImageSrc = null, newPopupImageSrc = null) => {
-        itemIcon.drawUnblurredImageAsync(newItemImageSrc ?? '');
-        popupImageSrc = newPopupImageSrc ?? '';
+    const redrawAsync = async (newItemImageSrc = null, newPopUpImageSrc = null) => {
+        popUpImageSrc = newPopUpImageSrc ?? '';
+        return await $('canvas', itemIcon).drawUnblurredImageAsync(newItemImageSrc ?? '');
     };
-    redraw(itemImageSrc, popupImageSrc);
+    redrawAsync(itemImageSrc, popUpImageSrc);
 
     const resetPos = () => {
         Object.assign(itemIcon.style, {
@@ -548,6 +559,7 @@ Create.itemSlot = ({
             const rect = itemIcon.offsetParent.getBoundingClientRect();
             Util.grabStart({
                 event,
+                target: itemIcon,
                 left: rect.x + 17,
                 top: rect.y + 17,
             });
@@ -558,9 +570,12 @@ Create.itemSlot = ({
                 return;
             }
             if (!isDragMoved) {
-                popup.hidden = true;
+                popUp.hidden = true;
             }
-            Util.grabMove({ event });
+            Util.grabMove({
+                event,
+                target: itemIcon,
+            });
         },
 
         onDragCancel: resetPos,
@@ -572,16 +587,16 @@ Create.itemSlot = ({
                 Trigger.onItemDrop(event);
                 return;
             }
-            if (!isDragMoved && popupImageSrc) {
-                popup.drawUnblurredImageAsync(popupImageSrc).then(() => {
-                    popup.moveToCursor(event);
+            if (!isDragMoved && popUpImageSrc) {
+                popUp.redrawAsync(popUpImageSrc).then(() => {
+                    popUp.moveToCursor(event);
                 });
             }
         },
     });
 
     Object.assign(rootElement, {
-        redraw,
+        redrawAsync,
     });
     return rootElement;
 };
@@ -589,7 +604,7 @@ Create.itemSlot = ({
 
 
 
-Create.outfit = ({
+Create.characterOutfit = ({
     imageSrc = null,
     isReverse = false,
     isSitting = false,
@@ -597,7 +612,7 @@ Create.outfit = ({
     alt = '',
 } = {}) => {
     Util.addStyleRules(/*css*/`
-        .outfit {
+        character-outfit {
             --outfit-basic-width: 130px;
             --outfit-max-width: 150px;
             --outfit-height: 125px;
@@ -657,13 +672,13 @@ Create.outfit = ({
 
 
     const rootElement = Util.elementize(/*html*/`
-        <figure class="outfit
+        <character-outfit class="
             ${ isReverse ? 'reverse': '' }
             ${ isSitting ? 'sitting' : '' }
             ${ isAttacking ? 'attacking' : '' }
         ">
             <img src="${ imageSrc ?? '' }" alt="${ alt }">
-        </figure>
+        </character-outfit>
     `);
 
     Object.assign(rootElement, {
@@ -677,62 +692,66 @@ Create.outfit = ({
 
 
 
-Create.scrollableSection = () => {
+Create.scrollSection = () => {
     Util.addStyleRules(/*css*/`
-        .scrollable-section {
-            position: relative;
+        scroll-section {
+            display: block;
             width: 100%;
             height: 100%;
+
+            &:not([hidden]) {
+                position: relative;
+            }
         }
 
-        .scrollable,
-        .scrollbar {
+        scroll-pages,
+        scroll-bar {
             position: absolute;
             top: 0;
             height: 100%;
             box-sizing: border-box;
-            --scrollbar-radius: 10px;
-            border-top-right-radius: var(--scrollbar-radius);
-            border-bottom-right-radius: var(--scrollbar-radius);
+            --scroll-bar-radius: 10px;
+            border-top-right-radius: var(--scroll-bar-radius);
+            border-bottom-right-radius: var(--scroll-bar-radius);
         }
 
-        .scrollable {
+        scroll-pages {
             width: 100%;
             border-top-left-radius: var(--view-radius);
             border-bottom-left-radius: var(--view-radius);
 
-            &[hidden] .page:not([hidden]) {
-                visibility: hidden;
+            scroll-page {
+                display: block;
             }
-            &:not([hidden]) .page[hidden] {
-                display: none;
-            }
-            .emoji {
+            shadowed-emoji {
                 text-shadow: 1px 1px var(--view-border-color);
             }
-            .compact-punctuation {
+            compact-punctuation {
                 margin-right: -4px;
             }
-            hr[hidden] {
-                display: none;
-            }
-            p .item-slot {
+            p item-slot {
                 display: inline-block;
-                border-width: 0 4px;
-                border-style: solid;
-                border-color: transparent;
+                border-inline: 4px solid transparent;
                 vertical-align: top;
 
                 &:has(.fukidashi) {
                     vertical-align: text-bottom;
                 }
             }
+            br.fix-left-edge {
+                +item-slot {
+                    border-left: none;
+                }
+                &[hidden] {
+                    display: none;
+                }
+            }
         }
 
-        .scrollbar {
+        scroll-bar {
             right: 0;
-            width: var(--scrollbar-entire-width);
-            background-color: var(--scrollbar-track-color);
+            width: var(--scroll-bar-entire-width);
+            background-color: var(--scroll-bar-track-color);
             border-width: 20px 3px 17px 2px;
             border-style: solid;
             border-color: var(--view-border-color);
@@ -758,7 +777,7 @@ Create.scrollableSection = () => {
                 bottom: -12px;
                 border-bottom: none;
             }
-            .scrollbar-thumb {
+            scroll-thumb {
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -767,50 +786,31 @@ Create.scrollableSection = () => {
                 border: 1px solid rgb(58, 188, 203);
                 background-color: rgb(95, 255, 234);
                 border-radius: 3px;
-
-                &[hidden] {
-                    visibility: hidden;
-                }
             }
         }
     `);
 
 
     const rootElement = Util.elementize(/*html*/`
-        <div class="scrollable-section">
-            <div class="scrollable"></div>
-            <div class="scrollbar">
-                <div class="scrollbar-thumb" hidden></div>
-            </div>
-        </div>
+        <scroll-section>
+            <scroll-pages></scroll-pages>
+            <scroll-bar>
+                <scroll-thumb hidden></scroll-thumb>
+            </scroll-bar>
+        </scroll-section>
     `);
-    const scrollable = $('.scrollable', rootElement);
-    const scrollbar = $('.scrollbar', rootElement);
-    const scrollbarThumb = $('.scrollbar-thumb', rootElement);
+    const scrollPages = $('scroll-pages', rootElement);
+    const scrollBar = $('scroll-bar', rootElement);
+    const scrollThumb = $('scroll-thumb', rootElement);
 
 
     const onResizeEnd = async () => {
         const fragment = new DocumentFragment();
-        for (const page of $$('.page', scrollable)) {
+        for (const page of $$('scroll-page', scrollPages)) {
             fragment.append(...page.children);
         }
         if (fragment.children.length) {
             replaceChildren(...fragment.children);
-        }
-    };
-
-    const removeItemSlotSpaces = (p) => {
-        if (!p.matches?.('p')) {
-            return;
-        }
-        for (const itemSlot of $$('.item-slot', p)) {
-            itemSlot.setAttribute('style', '');
-            if (itemSlot.offsetLeft === p.offsetLeft) {
-                itemSlot.style.borderLeftWidth = px(0);
-            }
-            if (itemSlot === p.lastChild) {
-                itemSlot.style.borderRightWidth = px(0);
-            }
         }
     };
 
@@ -819,41 +819,55 @@ Create.scrollableSection = () => {
     let maxThumbTop;
 
     const replaceChildren = (...staticElementList) => {
-        maxThumbTop = scrollbar.clientHeight - scrollbarThumb.offsetHeight;
+        maxThumbTop = scrollBar.clientHeight - scrollThumb.offsetHeight;
 
         const createPage = (firstChild) => {
-            const page = Util.elementize(/*html*/`<div class="page" hidden></div>`);
+            const page = Util.elementize(/*html*/`<scroll-page hidden></scroll-page>`);
             page.append(firstChild);
             return page;
         };
 
-        const pageMaxHeight = scrollable.clientHeight;
-        Util.clearChildrenPropsBeforeEmptying(scrollable);
-        scrollable.innerHTML = '';
-        scrollable.hidden = true;
+        const adjustItemSlotSpaces = (p) => {
+            if (!p.matches?.('p')) {
+                return;
+            }
+            for (const fixLeftEdge of $$('.fix-left-edge', p)) {
+                fixLeftEdge.remove();
+            }
+            for (const itemSlot of $$('item-slot', p)) {
+                if (itemSlot.offsetLeft !== p.offsetLeft) {
+                    continue;
+                }
+                const fixLeftEdge = Util.elementize(/*html*/`
+                    <br class="fix-left-edge">
+                `);
+                fixLeftEdge.hidden = itemSlot === p.firstChild;
+                itemSlot.insertAdjacentElement('beforebegin', fixLeftEdge);
+            }
+        };
+
+        const pageMaxHeight = scrollPages.clientHeight;
+        Util.clearChildrenPropsBeforeEmptying(scrollPages);
+        scrollPages.innerHTML = '';
+        scrollPages.hidden = true;
 
         let page = createPage(staticElementList.shift());
         page.hidden = false;
-        scrollable.append(page);
-        removeItemSlotSpaces(page.firstChild);
+        scrollPages.append(page);
+        adjustItemSlotSpaces(page.firstChild);
 
         for (const element of staticElementList) {
             page.append(element);
-            element.hidden = false;
-            removeItemSlotSpaces(element);
+            adjustItemSlotSpaces(element);
 
-            if (page.scrollHeight > pageMaxHeight) {
-                if (element.localName === 'hr') {
-                    element.hidden = true;
-                    continue;
-                }
+            if (page.clientHeight > pageMaxHeight) {
                 page = createPage(element);
-                scrollable.append(page);
+                scrollPages.append(page);
             }
         }
-        scrollable.hidden = false;
-        pages = [...scrollable.children];
-        scrollbarThumb.hidden = (pages.length < 2);
+        scrollPages.hidden = false;
+        pages = [...scrollPages.children];
+        scrollThumb.hidden = (pages.length < 2);
 
         updateThumbPosAndPage();
     };
@@ -884,7 +898,7 @@ Create.scrollableSection = () => {
             thumbTop ??= currentPageIndex / indexRatio;
 
             const newThumbTop = Util.clampNum(0, thumbTop, maxThumbTop);
-            scrollbarThumb.style.top = px(newThumbTop);
+            scrollThumb.style.top = px(newThumbTop);
         };
     })();
 
@@ -906,11 +920,11 @@ Create.scrollableSection = () => {
             .join('')
             .replace(
                 emojiRegex,
-                /*html*/`<span class="emoji" translate="no">$&</span>`
+                /*html*/`<shadowed-emoji translate="no">$&</shadowed-emoji>`
             )
             .replace(
                 /(、)(\$\[|「)/g,
-                ($0, $1, $2) => /*html*/`<span class="compact-punctuation">${ $1 }</span>${ $2 }`
+                ($0, $1, $2) => /*html*/`<compact-punctuation>${ $1 }</compact-punctuation>${ $2 }`
             )
             .replace(
                 /\$\[(.+?)\]/g,
@@ -927,7 +941,7 @@ Create.scrollableSection = () => {
             const isFukidashi = item.type === 'fukidashi';
             const itemSlot = Create.itemSlot({
                 itemImageSrc: item.icon,
-                popupImageSrc: item.popup,
+                popUpImageSrc: item.popUp,
                 isDraggable: false,
                 isFukidashi,
                 isShadowed: !isFukidashi,
@@ -937,14 +951,14 @@ Create.scrollableSection = () => {
         replaceChildren(...articleElement.children);
     };
 
-    Object.assign(scrollable, {
+    Object.assign(scrollPages, {
         onResizeEnd,
         onSwipeY(swipeDelta) {
             updateThumbPosAndPage({ pageDelta: Math.sign(-swipeDelta) });
         },
     });
 
-    Object.assign(scrollbar, {
+    Object.assign(scrollBar, {
         onDragEnd(event) {
             const clickedBarTop = event.offsetY;
             if (0 <= clickedBarTop && clickedBarTop <= maxThumbTop) {
@@ -955,12 +969,12 @@ Create.scrollableSection = () => {
         },
     });
 
-    Object.assign(scrollbarThumb, {
+    Object.assign(scrollThumb, {
         onDragStart(event) {
             Util.grabStart({ event });
         },
         onDragMove(event) {
-            updateThumbPosAndPage({ thumbTop: event.pageY - scrollbarThumb.grabStartTop });
+            updateThumbPosAndPage({ thumbTop: event.pageY - scrollThumb.grabStartTop });
         },
         onDragEnd(event) {
             event.stopPropagation();
@@ -988,11 +1002,11 @@ Create.characterSlot = ({
     itemSlots,
 }) => {
     Util.addStyleRules(/*css*/`
-        .character-slot {
+        character-slot {
             display: grid;
             border-width: 0 0 2px 2px;
             border-style: solid;
-            border-color: var(--scrollbar-track-color);
+            border-color: var(--scroll-bar-track-color);
             border-bottom-left-radius: 8px;
             row-gap: .5em;
             grid-template-columns: auto 1fr;
@@ -1000,22 +1014,21 @@ Create.characterSlot = ({
                 "outfit details"
                 "outfit slots";
 
-            .outfit {
+            character-outfit {
                 grid-area: outfit;
                 align-self: center;
             }
-
-            .chatacter-details {
+            chatacter-details {
                 grid-area: details;
 
-                [data-field-name] {
+                character-detail {
                     display: flex;
                     align-items: center;
 
                     &::before {
                         content: attr(data-field-name);
                         border-radius: 6px;
-                        background-color: var(--scrollbar-track-color);
+                        background-color: var(--scroll-bar-track-color);
                         color: var(--view-background-color);
                         font-weight: bold;
                         font-size: smaller;
@@ -1026,7 +1039,7 @@ Create.characterSlot = ({
                     }
                 }
             }
-            .item-slots {
+            item-slots {
                 grid-area: slots;
                 width: calc(100% - mod(100%, 42px));
                 height: calc(100% - mod(100%, 42px));
@@ -1034,7 +1047,7 @@ Create.characterSlot = ({
                 background-image: url("data:image/svg+xml;charset=utf-8,<svg viewBox='0 0 42 42' xmlns='http://www.w3.org/2000/svg'><path stroke='rgb(177, 162, 166)' stroke-width='2' d='M1,5 v30 a6,6 0 0 0 4,4 h30 a6,6 0 0 0 4,-4 v-30 a6,6 0 0 0 -4,-4 h-30 a6,6 0 0 0 -4,4' fill='none'></path><ellipse transform='translate(4 4)' cx='16' cy='24' rx='14' ry='8' fill='rgb(212,188,177)'></ellipse></svg>");
                 background-size: 42px 42px;
 
-                .item-slot {
+                item-slot {
                     float: left;
                     margin: 0 2px 2px 0;
                     box-sizing: border-box;
@@ -1042,21 +1055,18 @@ Create.characterSlot = ({
             }
         }
         @media (width < 450px) {
-            .character-slot {
-                .outfit {
-                    margin-left: -15px;
-                    margin-right: -30px;
-                }
+            character-slot character-outfit {
+                margin-inline: -15px -30px;
             }
         }
         @media (height < 480px) {
-            .character-slot {
+            character-slot {
                 grid-template-columns: auto 13em 1fr;
                 grid-template-areas: "outfit details slots";
                 row-gap: .3em;
                 border-style: none;
 
-                .outfit {
+                character-outfit {
                     margin: -25px -20px -10px -10px;
                 }
             }
@@ -1064,20 +1074,20 @@ Create.characterSlot = ({
     `);
 
     const rootElement = Util.elementize(/*html*/`
-        <div class="character-slot" data-element="${ element }">
-            <div class="chatacter-details">
-                <div data-field-name="なまえ">${ name }</div>
-                <div data-field-name="髪型">${ hair }</div>
-                <div data-field-name="メイク">${ makeup }</div>
-            </div>
-            <div class="item-slots"></div>
-        </div>
+        <character-slot data-element="${ element }">
+            <chatacter-details>
+                <character-detail data-field-name="なまえ">${ name }</character-detail>
+                <character-detail data-field-name="髪型">${ hair }</character-detail>
+                <character-detail data-field-name="メイク">${ makeup }</character-detail>
+            </chatacter-details>
+            <item-slots></item-slots>
+        </character-slot>
     `);
 
-    const outfit = Create.outfit({ imageSrc: `/images/character/${ thumbnail }.webp` });
+    const outfit = Create.characterOutfit({ imageSrc: `/images/character/${ thumbnail }.webp` });
     rootElement.prepend(outfit);
 
-    $('.item-slots', rootElement).append(...itemSlots);
+    $('item-slots', rootElement).append(...itemSlots);
     return rootElement;
 };
 
@@ -1085,9 +1095,9 @@ Create.characterSlot = ({
 
 {
     let topMostZIndex = 10;
-    Create.view = (id, title, isHorizontallyCentered = true) => {
+    Create.UIView = (id, title, isHorizontallyCentered = true) => {
         Util.addStyleRules(/*css*/`
-            .view {
+            ui-view {
                 display: flex;
                 width: 600px;
                 flex-direction: column;
@@ -1097,17 +1107,13 @@ Create.characterSlot = ({
                 color: var(--view-border-color);
                 z-index: ${ topMostZIndex };
 
-                &[hidden] {
-                    visibility: hidden;
-                }
                 &.horizontally-center {
                     position: absolute;
-                    margin: 0 auto;
+                    margin-inline: auto;
                     left: 0;
                     right: 0;
                 }
                 >h2 {
-                    flex-shrink: 0;
                     width: 100%;
                     background-color: var(--view-border-color);
                     color: var(--view-background-color);
@@ -1119,23 +1125,23 @@ Create.characterSlot = ({
                     -webkit-user-select: none;
                     user-select: none;
                 }
-                >section {
+                >article {
                     margin: 5px;
                     flex-grow: 1;
                 }
             }
             @media (width < 630px) {
-                .view {
+                ui-view {
                     width: calc(100vw - 20px);
                 }
             }
         `);
 
         const rootElement = Util.elementize(/*html*/`
-            <article id="${ id }" class="view" hidden>
+            <ui-view id="${ id }" hidden>
                 <h2>${ title }</h2>
-                <section></section>
-            </article>
+                <article></article>
+            </ui-view>
         `);
         if (isHorizontallyCentered) {
             rootElement.classList.add('horizontally-center');
@@ -1170,7 +1176,7 @@ Create.characterSlot = ({
                     margin: '',
                 });
             },
-            innerSpace: $('section', rootElement),
+            innerSpace: $('article', rootElement),
         });
         return rootElement;
     };
@@ -1188,19 +1194,15 @@ Create.characterSlot = ({
         threshold: 0.6,
     });
 
-    Create.background = ({
-        imageName,
-        imageAlt,
+    Create.snapShot = ({
+        bgImageName,
+        bgImageAlt,
         sprites,
     }) => {
         Util.addStyleRules(/*css*/`
-            .background {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-
+            snap-shot {
                 picture img,
-                >figure {
+                character-outfit {
                     position: absolute;
                     margin: auto;
                 }
@@ -1210,24 +1212,24 @@ Create.characterSlot = ({
             }
         `);
         const rootElement = Util.elementize(/*html*/`
-            <div class="background" data-image-name="${ imageName }">
+            <snap-shot data-bg-image-name="${ bgImageName }">
                 <picture>
                     <source
                         type="image/avif"
-                        srcset="/images/background/${ imageName }.avif"
+                        srcset="/images/background/${ bgImageName }.avif"
                     >
                     <img
-                        src="/images/background/${ imageName }.webp"
-                        alt="${ imageAlt }"
+                        src="/images/background/${ bgImageName }.webp"
+                        alt="${ bgImageAlt }"
                         width="1920"
                         height="1080"
                     >
                 </picture>
-            </div>
+            </snap-shot>
         `);
 
         for (const [imageSrc, option] of Object.entries(sprites)) {
-            const outfit = Create.outfit({
+            const outfit = Create.characterOutfit({
                 imageSrc,
                 isReverse: option.isReverse,
                 isSitting: option.isSitting,
@@ -1256,6 +1258,6 @@ export {
     px,
     Util,
     Trigger,
-    popup,
+    popUp,
     Create,
 };

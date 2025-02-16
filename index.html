@@ -17,8 +17,8 @@
         --view-radius: 6px;
         --view-background-color: rgb(254, 236, 204);
         --view-border-color: rgb(32, 43, 96);
-        --scrollbar-track-color: rgb(177, 162, 166);
-        --scrollbar-entire-width: 19px;
+        --scroll-bar-track-color: rgb(177, 162, 166);
+        --scroll-bar-entire-width: 19px;
     }
     @media (width < 630px) {
         :root {
@@ -27,7 +27,7 @@
     }
 
     ::selection {
-        background-color: var(--scrollbar-track-color);
+        background-color: var(--scroll-bar-track-color);
         color: var(--view-background-color);
     }
     body {
@@ -86,13 +86,13 @@
     }
     p {
         line-height: 34px;
-        margin: 16px 0;
+        margin-block: 16px;
 
-        &:first-child {
-            margin-top: 0;
+        &:first-of-type {
+            margin-block-start: 0;
         }
-        &:last-child {
-            margin-bottom: 0;
+        &:last-of-type {
+            margin-block-end: 0;
         }
     }
     img,
@@ -100,12 +100,13 @@
         -webkit-user-select: none;
         user-select: none;
     }
-    img:not([src]),
-    canvas:not([data-hashed-src]) {
+    img:not([src]) {
         visibility: hidden;
     }
-    [hidden] {
+    :where([hidden]) {
         display: revert;
+        position: absolute;
+        visibility: hidden;
     }
 
     .fixed-header-container {
