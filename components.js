@@ -35,14 +35,25 @@ const Util = {
     }) {
         target.grabStartLeft = left;
         target.grabStartTop = top;
+        target.isHorizontallyCentered = target.matches('.horizontally-center');
+
+        if (target.isHorizontallyCentered) {
+            target.grabStartLeft += (target.offsetParent.offsetWidth - target.offsetWidth) / 2;
+        }
     },
 
     grabMove({
         event,
         target = event.target,
     }) {
-        target.style.left = px(event.pageX - target.grabStartLeft);
-        target.style.top = px(event.pageY - target.grabStartTop);
+        const left = Math.round(event.pageX - target.grabStartLeft);
+        const top = Math.round(event.pageY - target.grabStartTop);
+        target.style.left = px(left);
+        target.style.top = px(top);
+
+        if (target.isHorizontallyCentered) {
+            target.style.right = px(-left);
+        }
     },
 
     clearChildrenPropsBeforeEmptying(element, isFirstCall = true) {
@@ -367,7 +378,7 @@ const Trigger = {
 
 
 const popUp = Util.elementize(/*html*/`
-    <pop-up>
+    <pop-up class="horizontally-center">
         <canvas hidden></canvas>
     </pop-up>
 `);
@@ -385,6 +396,8 @@ $('main').append(popUp);
             }
         }
     `);
+
+    const canvas = $('canvas', popUp);
 
     Object.assign(popUp, {
         onDragStart(event) {
@@ -405,22 +418,35 @@ $('main').append(popUp);
             }
         },
 
-        moveToCursor(pointerEvent) {
-            const { pageX, pageY } = pointerEvent;
-            const maxLeft = $('main').clientWidth - popUp.offsetWidth;
-            const maxTop = $('main').clientHeight - popUp.offsetHeight;
+        onOutfitJsonLoaded() {
+            popUp.hidden = true;
+        },
 
-            popUp.style.left = px(Util.clampNum(0, pageX - $('main').offsetLeft, maxLeft));
-            popUp.style.top = px(Util.clampNum(0, pageY - $('main').offsetTop, maxTop));
+        positionWithinViewport(pointerEvent = null) {
+            const { pageX, pageY } = pointerEvent;
+            const offsetParent = popUp.offsetParent;
+            const relativeX = pageX - offsetParent.offsetLeft;
+            const relativeY = pageY - offsetParent.offsetTop;
+
+            const width = canvas.offsetWidth;
+            const centerOffsetX = (offsetParent.offsetWidth - width) / 2;
+            const calculatedX = relativeX - centerOffsetX;
+            const left = Math.round(Util.clampNum(-centerOffsetX, calculatedX, centerOffsetX));
+
+            const maxTop = offsetParent.offsetHeight - popUp.offsetHeight;
+            const top = Math.round(Util.clampNum(0, relativeY, maxTop));
+
+            Object.assign(popUp.style, {
+                width: px(width),
+                left: px(left),
+                right: px(-left),
+                top: px(top),
+            })
             popUp.hidden = false;
         },
 
         async redrawAsync(src) {
-            return await $('canvas', popUp).drawUnblurredImageAsync(src);
-        },
-
-        onWindowResizeEnd() {
-            popUp.hidden = true;
+            return await canvas.drawUnblurredImageAsync(src);
         },
     });
 }
@@ -589,7 +615,7 @@ Create.itemSlot = ({
             }
             if (!isDragMoved && popUpImageSrc) {
                 popUp.redrawAsync(popUpImageSrc).then(() => {
-                    popUp.moveToCursor(event);
+                    popUp.positionWithinViewport(event);
                 });
             }
         },
@@ -1108,8 +1134,6 @@ Create.characterSlot = ({
                 z-index: ${ topMostZIndex };
 
                 &.horizontally-center {
-                    position: absolute;
-                    margin-inline: auto;
                     left: 0;
                     right: 0;
                 }
@@ -1160,7 +1184,6 @@ Create.characterSlot = ({
                     event,
                     target: rootElement,
                 });
-                rootElement.style.margin = 0;
             },
         });
 
@@ -1169,12 +1192,8 @@ Create.characterSlot = ({
                 rootElement.style.zIndex = topMostZIndex++;
             },
 
-            onWindowResizeEnd() {
-                Object.assign(rootElement.style, {
-                    left: '',
-                    top: '',
-                    margin: '',
-                });
+            onResizeEnd() {
+                rootElement.removeAttribute('style');
             },
             innerSpace: $('article', rootElement),
         });
