@@ -7,7 +7,7 @@
     <meta name="description" content="チョコットランドの好きすぎるコーデをひたすら紹介します！！😤チョコットランドを知らなくてもかわいいドット絵に癒されること間違いなし！！😇">
     <link rel="preload" as="fetch" href="/json/main.json" crossorigin="anonymous">
     <link rel="preload" as="fetch" href="/json/hapinesuwanpi.json" crossorigin="anonymous">
-    <link rel="preload" as="image" href="/images/background/wistera.avif" type="image/avif">
+    <link rel="preload" as="image" href="/images/areas/wistera.avif" type="image/avif">
     <script src="/components.js" type="module"></script>
     <script src="/main.js" type="module"></script>
     <title>チョコットランドのコーデが好きすぎる</title>
@@ -15,7 +15,7 @@
     :root {
         --outer-frame-width: 10px;
         --view-radius: 6px;
-        --view-background-color: rgb(254, 236, 204);
+        --view-bg-color: rgb(254, 236, 204);
         --view-border-color: rgb(32, 43, 96);
         --scroll-bar-track-color: rgb(177, 162, 166);
         --scroll-bar-entire-width: 19px;
@@ -28,7 +28,7 @@
 
     ::selection {
         background-color: var(--scroll-bar-track-color);
-        color: var(--view-background-color);
+        color: var(--view-bg-color);
     }
     body {
         font-family: sans-serif;
@@ -42,7 +42,7 @@
         box-sizing: border-box;
         cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAWBAMAAADHkSqFAAAAElBMVEVHcEySi6iws83////e3vVWU23WRqBqAAAAAXRSTlMAQObYZgAAAJNJREFUGNNNkEEOxCAIRe3CA2j0AI56AfECVWY/mnD/qwy1pPWveOET+Cjlf+rVEb871bY1dUVuGhKKWMlEEJwAIQGU26+5ZKFMjwsRs0zaDvUhNexOLnQmWXLAGQFbanQTsrMDrKN0QhZDWksmsg8KuUV6YoiQ6SPnEMVK44mmXTHOP8Fms+ebcyT0W2ib9//QBX9hUR8RdgCMqgAAAABJRU5ErkJggg=='), auto;
 
-        &.pointer-pressing {
+        &.animation-playing {
             animation: pressing 0.4s infinite;
             animation-delay: 0.2s;
         }
@@ -136,7 +136,7 @@
         h1 {
             align-self: center;
             text-align: center;
-            background: var(--view-background-color);
+            background: var(--view-bg-color);
             width: 100%;
             max-width: 800px;
             border-radius: 6px;

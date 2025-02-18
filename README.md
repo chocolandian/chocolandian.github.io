@@ -1,5 +1,5 @@
 ## チョコットランドのコーデが好きすぎる
-<img src="/images/character/hapinesuwanpi.webp" width="130px" alt="ハピネスワンピ"><br>
+<img src="/images/outfits/hapinesuwanpi/standing.webp" width="130px" alt="ハピネスワンピ"><br>
 [チョコットランドのコーデが好きすぎる](https://chocolandian.github.io/)<br>
 <br>
 <br>

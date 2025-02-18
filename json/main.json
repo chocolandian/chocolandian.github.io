@@ -43,7 +43,7 @@
     "月夜のナイトウェア白": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAQlBMVEVHcEzG7PWd2fX86q3NsnXt04X9+viJeVeulGLAp5fw4dfbx8E4VnSCveZekLxRcJDc9/yiZFb+8s27jGf/8ZTqy3jagq/yAAAAAXRSTlMAQObYZgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAYpJREFUOMutU1l2wzAIDAgEaPGa3v+qHdlp2iztV/VebAlGw3gIl8v/LjvXb2l3l7Hwfp/v6oakufY3iAjlJEcFSawRz/lclDdQGAg21pJfEFUTHRSCt9Z4rVESbWnf17RRKvFGRM4b7dfrvtKWXwpAo0WUbd2vH+tWjtOTArMCjoMB94vZowpcge6Itq4rLuObHigAzzXCpU1zm5uJRyBy99ycGT6JyzwAU8MOTjH7DWHSSVVHfmo8WMRxpi5fAGZNSc8KfFKMALOd+kpnQcDVW5t4ag075IV7GUqjlDr6rKbOAzCzYz+6XsvhaNSS0WRDEZoHgFAAPfNcbl7AoJpDkzDhemvEkjQQuxsOGbmWJET4ClqIJJWayw+rbBiDCtROgOsw7vu/aV4FHM6UM34A4L5UvztpHlAkxEteAFggArrDv7x2MbcqTpwPQCZ2qYiJ3wq4AOzW+5LpfNgIwImDwnT0ScfA9N4v44H9EdOzBg5w9nGeDN6LfquES08AePVzBl8H8o8RfVyfEl0Sb4V/g+MAAAAASUVORK5CYII=",
     "チョコスコーレ": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAKlBMVEVHcEw9O2Bsa5pZWoH////v3PCjjqrVv9YzYYfdbpN4ZoP/p7VPgbtpm+f1H7bJAAAAAXRSTlMAQObYZgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAPtJREFUKM9jYCAWCAoKoPFRRQQNgQKGCBHGySAB44lwAWFrJbEyIW1jmBK2QKNNpq5GmwzDYAKuwpqTi2cqi7rBjAwpFFY8qCxYEgjVM0k8LFDihmBYuNAEiB2am8VdOzpa3YV3KkIEjDTFKk5knCiTVDKEmmEslXGj4kaWMNxpglwVR01PVDEinMoV2hLSGoXkF7YQV1OXMCSBdBeXEBf3BIRAqourqIsrQoCt0MVR0MWxDCEg6FIoWOIoBhdIFHQVNBR1FITrEVQMFlQUDlSEuYNRWFFZWBlICMIEhIQVhZUFlYUE4WEqpCikJKgkiHAHoyBQQBBvRFEEAJw8MGkwou70AAAAAElFTkSuQmCC"
   },
-  "characters": [
+  "charas": [
     {
       "details": {
         "name": "kaikoing",
@@ -177,37 +177,37 @@
     }
   ],
   "articles": {
-    "message-info": "チョコットランドのコーデをひたすら紹介するファンサイトです$[|ファイトフキダシ]\n$[|アリガトフキダシ]<strong><a href=\"https://chocottoland.hange.jp/\" target=\"_blank\">チョコットランド - オンラインRPG</a></strong>$[|ヨロシクフキダシ]\n\n!<style>#message-info-tab-panel a img { width: 48px; height: 24px; object-fit: contain; vertical-align: sub; margin-left: -8px; }</style>\n<a href=\"https://x.com/chocolandian\" target=\"_blank\"><img style=\"height: 22px;\" src=\"/images/misc/logo-x.png\" alt=\"Xのロゴ\">@chocolandian</a>$[|ラッキーフキダシ]\n<a href=\"https://github.com/chocolandian/chocolandian.github.io\" target=\"_blank\"><img src=\"/images/misc/logo-github.png\" alt=\"Githubのロゴ\">chocolandian.github.io</a>$[|ニゲテフキダシ]\n\n<small style=\"line-height: normal;\">当サイトに掲載されているチョコットランドの画像の著作権は、<a href=\"https://coconev.co.jp\" target=\"_blank\">cocone v 株式会社</a>に帰属します。</small>"
+    "msgInfo": "チョコットランドのコーデをひたすら紹介するファンサイトです$[|ファイトフキダシ]\n$[|アリガトフキダシ]<strong><a href=\"https://chocottoland.hange.jp/\" target=\"_blank\">チョコットランド - オンラインRPG</a></strong>$[|ヨロシクフキダシ]\n\n!<style>#msg-info-tab-panel a img { width: 48px; height: 24px; object-fit: contain; vertical-align: sub; margin-left: -8px; }</style>\n<a href=\"https://x.com/chocolandian\" target=\"_blank\"><img style=\"height: 22px;\" src=\"/images/misc/logo-x.png\" alt=\"Xのロゴ\">@chocolandian</a>$[|ラッキーフキダシ]\n<a href=\"https://github.com/chocolandian/chocolandian.github.io\" target=\"_blank\"><img src=\"/images/misc/logo-github.png\" alt=\"Githubのロゴ\">chocolandian.github.io</a>$[|ニゲテフキダシ]\n\n<small style=\"line-height: normal;\">当サイトに掲載されているチョコットランドの画像の著作権は、<a href=\"https://coconev.co.jp\" target=\"_blank\">cocone v 株式会社</a>に帰属します。</small>"
   },
   "snapShots": [
     {
-      "bgImageName": "wistera",
-      "bgImageAlt": "ウィステラの街の背景",
+      "areaImageName": "wistera",
+      "areaImageAlt": "ウィステラの街の背景",
       "description": "ウィステラの街",
       "sprites": {
-        "/images/background/sprites/hapinesuwanpi-sitting.webp": {
+        "/images/outfits/hapinesuwanpi/sitting.webp": {
           "left": 345,
           "top": -150,
           "isSitting": true
         },
-        "/images/character/yuruusapa-ka-momo.webp": {
+        "/images/outfits/yuruusapa-ka-momo/standing.webp": {
           "left": -360,
           "top": 50,
           "isReverse": true
         },
-        "/images/background/sprites/tsukiyononaitoweashiro-fainting.webp": {
+        "/images/outfits/tsukiyononaitoweashiro/fainting.webp": {
           "left": -450,
           "top": -100,
           "isReverse": true,
           "isSitting": true
         },
-        "/images/background/sprites/wabijinnadeshiko-preparing.webp": {
+        "/images/outfits/wabijinnadeshiko/preparing.webp": {
           "left": 410,
           "top": -10,
           "isReverse": true,
           "isAttacking": true
         },
-        "/images/background/sprites/training-barrel.webp": {
+        "/images/misc/training-barrel.webp": {
           "left": 460,
           "top": -4,
           "isAlwaysVisible": true

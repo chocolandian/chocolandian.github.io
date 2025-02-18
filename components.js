@@ -1,6 +1,6 @@
 const $ = (selectors, ancestor = document) => ancestor.querySelector(selectors);
 const $$ = (selectors, ancestor = document) => [...ancestor.querySelectorAll(selectors)];
-const px = (value) => `${ value }px`;
+const px = (value) => `${ Math.trunc(value) }px`;
 
 const Util = {
     clampNum(min, num, max) {
@@ -46,14 +46,13 @@ const Util = {
         event,
         target = event.target,
     }) {
-        const left = Math.round(event.pageX - target.grabStartLeft);
-        const top = Math.round(event.pageY - target.grabStartTop);
-        target.style.left = px(left);
-        target.style.top = px(top);
-
-        if (target.isHorizontallyCentered) {
-            target.style.right = px(-left);
-        }
+        const left = event.pageX - target.grabStartLeft;
+        const top = event.pageY - target.grabStartTop;
+        Object.assign(target.style, {
+            left: px(left),
+            top: px(top),
+            right: target.isHorizontallyCentered ? px(-left) : null,
+        });
     },
 
     clearChildrenPropsBeforeEmptying(element, isFirstCall = true) {
@@ -150,7 +149,7 @@ HTMLCanvasElement.prototype.drawUnblurredImageAsync = async function(src) {
         isDragMoved = false;
 
         getSelection().removeAllRanges();
-        $('body').classList.add('pointer-pressing');
+        $('body').classList.add('animation-playing');
         propagateDragEvent('onDragStart', event);
     };
 
@@ -178,7 +177,9 @@ HTMLCanvasElement.prototype.drawUnblurredImageAsync = async function(src) {
 
 
     const canDragEnd = (event) => {
-        $('body').classList.remove('pointer-pressing');
+        $('body').addEventListener('animationiteration', () => {
+            $('body').classList.remove('animation-playing');
+        }, { once: true });
 
         if (event.pointerType === 'touch') {
             for (const eventName of ['mousedown', 'mouseup']) {
@@ -244,7 +245,6 @@ HTMLCanvasElement.prototype.drawUnblurredImageAsync = async function(src) {
         'onSwipeY',
         'onWheelEnd',
         'onResizeEnd',
-        'onWindowResizeEnd',
         'onItemDrop',
         'onMainJsonLoaded',
         'onOutfitJsonLoaded',
@@ -323,14 +323,6 @@ HTMLCanvasElement.prototype.drawUnblurredImageAsync = async function(src) {
                 } else {
                     entry.target.classList.add('resize-observer-initialized');
                 }
-            }
-        })
-    );
-
-    window.addEventListener('resize',
-        waitForEnd(() => {
-            for (const element of $$('.onWindowResizeEnd')) {
-                element.onWindowResizeEnd();
             }
         })
     );
@@ -422,26 +414,26 @@ $('main').append(popUp);
             popUp.hidden = true;
         },
 
-        positionWithinViewport(pointerEvent = null) {
+        positionWithinViewport(pointerEvent) {
             const { pageX, pageY } = pointerEvent;
             const offsetParent = popUp.offsetParent;
+
             const relativeX = pageX - offsetParent.offsetLeft;
             const relativeY = pageY - offsetParent.offsetTop;
 
-            const width = canvas.offsetWidth;
-            const centerOffsetX = (offsetParent.offsetWidth - width) / 2;
-            const calculatedX = relativeX - centerOffsetX;
-            const left = Math.round(Util.clampNum(-centerOffsetX, calculatedX, centerOffsetX));
+            const maxLeft = offsetParent.offsetWidth - canvas.offsetWidth;
+            const maxTop = offsetParent.offsetHeight - canvas.offsetHeight;
 
-            const maxTop = offsetParent.offsetHeight - popUp.offsetHeight;
-            const top = Math.round(Util.clampNum(0, relativeY, maxTop));
+            const marginLeftWidth = maxLeft / 2;
+            const left = Util.clampNum(0, relativeX, maxLeft) - marginLeftWidth;
+            const top = Util.clampNum(0, relativeY, maxTop);
 
             Object.assign(popUp.style, {
-                width: px(width),
                 left: px(left),
                 right: px(-left),
                 top: px(top),
-            })
+                width: px(canvas.offsetWidth),
+            });
             popUp.hidden = false;
         },
 
@@ -469,7 +461,7 @@ Create.itemSlot = ({
             position: relative;
             width: 32px;
             height: 32px;
-            background-color: var(--view-background-color);
+            background-color: var(--view-bg-color);
 
             &::before ,
             item-icon {
@@ -482,7 +474,7 @@ Create.itemSlot = ({
             &.shadowed::before {
                 background-image: url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><ellipse cx='16' cy='24' rx='14' ry='8' fill='rgb(212,188,177)'></ellipse></svg>");
                 background-repeat: no-repeat;
-                background-color: var(--view-background-color);
+                background-color: var(--view-bg-color);
                 content: "";
             }
             item-icon {
@@ -630,7 +622,7 @@ Create.itemSlot = ({
 
 
 
-Create.characterOutfit = ({
+Create.charaOutfit = ({
     imageSrc = null,
     isReverse = false,
     isSitting = false,
@@ -638,7 +630,7 @@ Create.characterOutfit = ({
     alt = '',
 } = {}) => {
     Util.addStyleRules(/*css*/`
-        character-outfit {
+        chara-outfit {
             --outfit-basic-width: 130px;
             --outfit-max-width: 150px;
             --outfit-height: 125px;
@@ -698,13 +690,13 @@ Create.characterOutfit = ({
 
 
     const rootElement = Util.elementize(/*html*/`
-        <character-outfit class="
+        <chara-outfit class="
             ${ isReverse ? 'reverse': '' }
             ${ isSitting ? 'sitting' : '' }
             ${ isAttacking ? 'attacking' : '' }
         ">
             <img src="${ imageSrc ?? '' }" alt="${ alt }">
-        </character-outfit>
+        </chara-outfit>
     `);
 
     Object.assign(rootElement, {
@@ -782,8 +774,8 @@ Create.scrollSection = () => {
             border-style: solid;
             border-color: var(--view-border-color);
             box-shadow:
-                -1px 0 var(--view-background-color) inset,
-                1px 0 var(--view-background-color) inset;
+                -1px 0 var(--view-bg-color) inset,
+                1px 0 var(--view-bg-color) inset;
 
             &::before,
             &::after {
@@ -793,7 +785,7 @@ Create.scrollSection = () => {
                 border-radius: 2px / 6px;
                 border-style: solid;
                 border-width: 8px;
-                border-color: var(--view-background-color) transparent;
+                border-color: var(--view-bg-color) transparent;
             }
             &::before {
                 top: -14px;
@@ -848,7 +840,8 @@ Create.scrollSection = () => {
         maxThumbTop = scrollBar.clientHeight - scrollThumb.offsetHeight;
 
         const createPage = (firstChild) => {
-            const page = Util.elementize(/*html*/`<scroll-page hidden></scroll-page>`);
+            const page = document.createElement('scroll-page');
+            page.hidden = true;
             page.append(firstChild);
             return page;
         };
@@ -1019,7 +1012,7 @@ Create.scrollSection = () => {
 
 
 
-Create.characterSlot = ({
+Create.charaSlot = ({
     name,
     hair,
     makeup,
@@ -1028,7 +1021,7 @@ Create.characterSlot = ({
     itemSlots,
 }) => {
     Util.addStyleRules(/*css*/`
-        character-slot {
+        chara-slot {
             display: grid;
             border-width: 0 0 2px 2px;
             border-style: solid;
@@ -1040,22 +1033,22 @@ Create.characterSlot = ({
                 "outfit details"
                 "outfit slots";
 
-            character-outfit {
+            chara-outfit {
                 grid-area: outfit;
                 align-self: center;
             }
-            chatacter-details {
+            chara-profile {
                 grid-area: details;
 
-                character-detail {
+                chara-attr {
                     display: flex;
                     align-items: center;
 
                     &::before {
-                        content: attr(data-field-name);
+                        content: attr(data-attr-name);
                         border-radius: 6px;
                         background-color: var(--scroll-bar-track-color);
-                        color: var(--view-background-color);
+                        color: var(--view-bg-color);
                         font-weight: bold;
                         font-size: smaller;
                         width: 4em;
@@ -1081,18 +1074,18 @@ Create.characterSlot = ({
             }
         }
         @media (width < 450px) {
-            character-slot character-outfit {
+            chara-slot chara-outfit {
                 margin-inline: -15px -30px;
             }
         }
         @media (height < 480px) {
-            character-slot {
+            chara-slot {
                 grid-template-columns: auto 13em 1fr;
                 grid-template-areas: "outfit details slots";
                 row-gap: .3em;
                 border-style: none;
 
-                character-outfit {
+                chara-outfit {
                     margin: -25px -20px -10px -10px;
                 }
             }
@@ -1100,17 +1093,17 @@ Create.characterSlot = ({
     `);
 
     const rootElement = Util.elementize(/*html*/`
-        <character-slot data-element="${ element }">
-            <chatacter-details>
-                <character-detail data-field-name="なまえ">${ name }</character-detail>
-                <character-detail data-field-name="髪型">${ hair }</character-detail>
-                <character-detail data-field-name="メイク">${ makeup }</character-detail>
-            </chatacter-details>
+        <chara-slot data-element="${ element }">
+            <chara-profile>
+                <chara-attr data-attr-name="なまえ">${ name }</chara-attr>
+                <chara-attr data-attr-name="ヘア">${ hair }</chara-attr>
+                <chara-attr data-attr-name="メイク">${ makeup }</chara-attr>
+            </chara-profile>
             <item-slots></item-slots>
-        </character-slot>
+        </chara-slot>
     `);
 
-    const outfit = Create.characterOutfit({ imageSrc: `/images/character/${ thumbnail }.webp` });
+    const outfit = Create.charaOutfit({ imageSrc: `/images/outfits/${ thumbnail }/standing.webp` });
     rootElement.prepend(outfit);
 
     $('item-slots', rootElement).append(...itemSlots);
@@ -1127,7 +1120,7 @@ Create.characterSlot = ({
                 display: flex;
                 width: 600px;
                 flex-direction: column;
-                background-color: var(--view-background-color);
+                background-color: var(--view-bg-color);
                 border: 3px solid var(--view-border-color);
                 border-radius: var(--view-radius);
                 color: var(--view-border-color);
@@ -1140,7 +1133,7 @@ Create.characterSlot = ({
                 >h2 {
                     width: 100%;
                     background-color: var(--view-border-color);
-                    color: var(--view-background-color);
+                    color: var(--view-bg-color);
                     line-height: 1.5;
                     font-size: smaller;
                     padding: 1px 1px 0;
@@ -1214,14 +1207,14 @@ Create.characterSlot = ({
     });
 
     Create.snapShot = ({
-        bgImageName,
-        bgImageAlt,
+        areaImageName,
+        areaImageAlt,
         sprites,
     }) => {
         Util.addStyleRules(/*css*/`
             snap-shot {
                 picture img,
-                character-outfit {
+                chara-outfit {
                     position: absolute;
                     margin: auto;
                 }
@@ -1231,15 +1224,15 @@ Create.characterSlot = ({
             }
         `);
         const rootElement = Util.elementize(/*html*/`
-            <snap-shot data-bg-image-name="${ bgImageName }">
+            <snap-shot data-bg-image-name="${ areaImageName }">
                 <picture>
                     <source
                         type="image/avif"
-                        srcset="/images/background/${ bgImageName }.avif"
+                        srcset="/images/areas/${ areaImageName }.avif"
                     >
                     <img
-                        src="/images/background/${ bgImageName }.webp"
-                        alt="${ bgImageAlt }"
+                        src="/images/areas/${ areaImageName }.webp"
+                        alt="${ areaImageAlt }"
                         width="1920"
                         height="1080"
                     >
@@ -1248,7 +1241,7 @@ Create.characterSlot = ({
         `);
 
         for (const [imageSrc, option] of Object.entries(sprites)) {
-            const outfit = Create.characterOutfit({
+            const outfit = Create.charaOutfit({
                 imageSrc,
                 isReverse: option.isReverse,
                 isSitting: option.isSitting,
